@@ -11,7 +11,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_\_.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an B-
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from a Lab or Challenge assignment where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -63,8 +63,7 @@ demographics <- hiphop_clean |>
 # Lab 4 Q3
 clean_avocado |> 
   semi_join(regions_major, by = "region") |>
- filter(year == 2017 ,  
-          type == "organic") |>
+ filter(year == 2017, type == "organic") |>
   group_by(region) |>
   summarise(sum_region = sum(`Small/Medium`)) |>
   slice_max(sum_region)
@@ -75,7 +74,9 @@ clean_avocado |>
 ```{r wd-3-string}
 #Lab 3 Q13
 white_men_above_30 <- hiphop_clean |>
-  filter(sex == "Male", ethnicity == "white", age > 30) 
+  filter(sex == "Male", 
+         ethnicity == "white", 
+         age > 30) 
 
 ```
 
@@ -85,8 +86,7 @@ white_men_above_30 <- hiphop_clean |>
 # Lab 4 Q3
 clean_avocado |> 
   semi_join(regions_major, by = "region") |>
- filter(year == 2017 ,  
-          type == "organic") |>
+ filter(year == 2017, type == "organic") |>
   group_by(region) |>
   summarise(sum_region = sum(`Small/Medium`)) |>
   slice_max(sum_region)
@@ -111,7 +111,13 @@ suspects <- suspects %>%
 -   numeric
 
 ```{r wd-4-numeric}
-
+#Lab 3 Q5 (revised the mutate_at)
+hiphop_clean <- hiphop |>
+  mutate(word = as.factor(word),
+         sex = as.factor(sex),
+         ethnic = as.factor(ethnic),
+         across(where(is.numeric), as.factor)) |>
+  drop_na(word, sex, ethnic)
 
 ```
 
@@ -125,20 +131,39 @@ word_clean <- wordclean |>
 
 #lab 3 question 7 
 hiphop_clean <- hiphop_clean |> 
-  mutate(ethnicity = if_else(ethnic == "white", "white", "non-white"))
+  mutate(ethnicity = if_else(ethnic == "white", 
+                             "white", "non-white"))
 
 ```
 
 -   factor
 
 ```{r wd-4-factor}
+#Lab 3 Q5 (revised the mutate_at)
+hiphop_clean <- hiphop |>
+  mutate(word = as.factor(word),
+         sex = as.factor(sex),
+         ethnic = as.factor(ethnic),
+         across(where(is.numeric), as.factor)) |>
+  drop_na(word, sex, ethnic)
 
 ```
 
 -   date
 
 ```{r wd-4-date}
+#Lab 5 Time Series Q1 
+summarized_data <- surveys |> 
+  mutate(Date = ymd(date))
 
+ggplot(data= summarized_data, aes(x = year, y = weight, color = genus)) +
+  geom_line() +
+  theme_classic() +
+  scale_x_continuous(limits = c(1977, 2002)) +
+  scale_color_discrete(guide = guide_legend(title = "Genus")) +
+  labs(x = "Year", 
+       y = "Weight (grams)", 
+       title = "Variation of Weights for each Genus over Time")
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
@@ -163,6 +188,7 @@ prob only used one used in lab 4
 ```{r wd-5-inner}
 #preview activiy
 
+
 ```
 
 -   `full_join()`
@@ -180,8 +206,7 @@ prob only used one used in lab 4
 #lab 4 Q3
 clean_avocado |> 
   semi_join(regions_major, by = "region") |>
- filter(year == 2017 ,  
-          type == "organic") |>
+ filter(year == 2017, type == "organic") |>
   group_by(region) |>
   summarise(sum_region = sum(`Small/Medium`)) |>
   slice_max(sum_region)
@@ -190,15 +215,20 @@ clean_avocado |>
 -   `anti_join()`
 
 ```{r wd-6-anti}
-#Lab4 Q5 
-other_regions <- tibble(region = c("California", "NewYork", "SouthCarolina", "TotalUS","West","GreatLakes","Midsouth", "Northeast", "Plains", "SouthCentral", "Southeast"))
+#Lab4 Q5 revised arrange desc into slice_max
+
+other_regions <- tibble(region = c("California", "NewYork", 
+                                   "SouthCarolina", "TotalUS",
+                                   "West","GreatLakes",
+                                   "Midsouth", "Northeast", 
+                                   "Plains", "SouthCentral", 
+                                   "Southeast"))
                                    
 metro_regions <- clean_avocado |> 
   anti_join(other_regions, by = "region") |>
   group_by(region) |>
   summarize(region_mean = mean(`Total Volume`)) |>
-  arrange(desc(region_mean)) |>
-  head(5) 
+  slice_max(region_mean, n=5) 
 
 highest_five <- clean_avocado |> 
   filter(region == metro_regions$region)
@@ -208,7 +238,8 @@ ggplot(data = highest_five, mapping = aes(x=region, y= `Total Volume`)) +
   geom_boxplot() + 
   geom_jitter() +
   labs(x="Region", y="Total Average Volume", 
-       title = "Total volume for the five regions with the highest averages for the Total Volume variable")
+       title = "Total volume for the five regions 
+       with the highest averages for the Total Volume variable")
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -237,7 +268,9 @@ ggplot(data = avocado_size,
 
 ```{r wd-7-wide}
 #Lab 4 Q6
-regions_cali <- tibble(region = c("LosAngeles","SanDiego", "Sacramento", "SanFrancisco"))
+
+regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
+                                  "Sacramento", "SanFrancisco"))
 
 regions_cali <- clean_avocado |> 
   semi_join(regions_cali, by = "region") 
@@ -252,8 +285,10 @@ avocado_price_difference <- average_price_by_region |>
   mutate(difference = organic-conventional) |>
   arrange(desc(difference))
 
-ggplot(data = average_price_by_region, aes(x = region, y=average_price, fill=type)) + geom_line(aes(group = average_price)) + 
-   geom_segment(aes(xend = region,
+ggplot(data = average_price_by_region, 
+       aes(x = region, y=average_price, fill=type)) + 
+       geom_line(aes(group = average_price)) + 
+       geom_segment(aes(xend = region,
                    yend = 0)) +
   geom_point(aes(color= type)) +
   labs(x = "Region of CA", y = "Average Price")
@@ -271,13 +306,24 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r r-2-1}
+#Lab 3 Q5 (revised the mutate_at)
+hiphop_clean <- hiphop |>
+  mutate(word = as.factor(word),
+         sex = as.factor(sex),
+         ethnic = as.factor(ethnic),
+         across(where(is.numeric), as.factor)) |>
+  drop_na(word, sex, ethnic)
 
 ```
 
 -   Example 2
 
 ```{r r-2-2}
-
+#Lab 3 Q13
+white_men_above_30 <- hiphop_clean |>
+  filter(sex == "Male", 
+         ethnicity == "white", 
+         age > 30) 
 ```
 
 **R-3: I can write robust programs that are resistant to changes in inputs.**
@@ -285,13 +331,31 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r r-3-1}
-
+#lab 4 Q3
+clean_avocado |> 
+  semi_join(regions_major, by = "region") |>
+ filter(year == 2017, type == "organic") |>
+  group_by(region) |>
+  summarise(sum_region = sum(`Small/Medium`)) |>
+  slice_max(sum_region)
 ```
 
 -   Example 2
 
 ```{r r-3-2}
+#Lab 3 Q13
+white_men_above_30 <- hiphop_clean |>
+  filter(sex == "Male", ethnicity == "white", age > 30) 
 
+most_familiar_words <- white_men_above_30 |>
+  group_by(word) |>
+  summarize(mean_familiarity = mean(familiarity)) |>
+  slice_max(mean_familiarity, n = 1)
+
+least_familiar_words <- white_men_above_30 |>
+  group_by(word) |>
+  summarize(mean_familiarity = mean(familiarity)) |>
+  slice_min(mean_familiarity, n = 1)
 ```
 
 ## Data Visualization & Summarization
@@ -327,12 +391,40 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r dvs-2-1}
+#Lab 5 Captures over the week question 1 
+rodents <- surveys |> 
+  group_by(day_of_week) |>
+  summarize(captured_rodents = n()) |> 
+  drop_na()
 
+ggplot(data= rodents, 
+       aes(x = reorder(day_of_week, captured_rodents), y = captured_rodents, fill = captured_rodents)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Day of Week", 
+       y = "Number of Rodents", 
+       title = "Number of Rodents Captured Each Day of the Week") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  theme_classic()
 ```
 
 -   Example 2
 
 ```{r dvs-2-2}
+#Lab 4 Q7 
+avocado_size <- regions_cali |>
+  pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
+               names_to = "Size", values_to = "Volume") |>
+group_by(region, Size, type) |> 
+summarize(volume_sold = sum(Volume))
+
+
+ggplot(data = avocado_size, 
+       mapping = aes(x = region, y = volume_sold, fill = Size)) +
+  geom_bar(position = "fill", stat = "identity") +  
+  scale_x_continuous(labels=scales::percent)+facet_wrap(.~type) + 
+  scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
+  labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
+       fill = "Avocado Size")
 
 ```
 
@@ -341,13 +433,29 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r dvs-3-1}
-
+#Lab 2 Q14
+ggplot(data = surveys, mapping = aes(x=species, y=weight)) + 
+  geom_boxplot(outlier.shape=NA) + geom_jitter(col="tomato", alpha=0.1) +
+  labs(x="Species", y="Weight", title = "Distribution of weight within each Species")
 ```
 
 -   Example 2
 
 ```{r dvs-3-2}
+#Lab 5 Captures over the week question 1 
+rodents <- surveys |> 
+  group_by(day_of_week) |>
+  summarize(captured_rodents = n()) |> 
+  drop_na()
 
+ggplot(data= rodents, 
+       aes(x = reorder(day_of_week, captured_rodents), y = captured_rodents, fill = captured_rodents)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Day of Week", 
+       y = "Number of Rodents", 
+       title = "Number of Rodents Captured Each Day of the Week") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  theme_classic()
 ```
 
 **DVS-4: I can calculate numerical summaries of variables.**
@@ -355,12 +463,33 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r dvs-4-1}
+#Lab 3 Q13
+white_men_above_30 <- hiphop_clean |>
+  filter(sex == "Male", ethnicity == "white", age > 30) 
 
+most_familiar_words <- white_men_above_30 |>
+  group_by(word) |>
+  summarize(mean_familiarity = mean(familiarity)) |>
+  slice_max(mean_familiarity, n = 1)
+
+least_familiar_words <- white_men_above_30 |>
+  group_by(word) |>
+  summarize(mean_familiarity = mean(familiarity)) |>
+  slice_min(mean_familiarity, n = 1)
 ```
 
 -   Example 2
 
 ```{r dvs-4-2}
+#Lab 4 Q3
+library(lubridate)
+clean_avocado |> 
+  semi_join(regions_major, by = "region") |>
+ filter(year == 2017 ,  
+          type == "organic") |>
+  group_by(region) |>
+  summarise(sum_region = sum(`Small/Medium`)) |>
+  slice_max(sum_region)
 
 ```
 
@@ -369,12 +498,52 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r dvs-5-1}
+#Lab 4 Q7 
+avocado_size <- regions_cali |>
+  pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
+               names_to = "Size", values_to = "Volume") |>
+group_by(region, Size, type) |> 
+summarize(volume_sold = sum(Volume))
 
+
+ggplot(data = avocado_size, 
+       mapping = aes(x = region, y = volume_sold, fill = Size)) +
+  geom_bar(position = "fill", stat = "identity") +  
+  scale_x_continuous(labels=scales::percent)+facet_wrap(.~type) + 
+  scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
+  labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
+       fill = "Avocado Size")
 ```
 
 -   Example 2
 
 ```{r dvs-5-2}
+#Lab 4 Q6 (not sure if too many objects here and if it relates to question???)
+
+
+regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
+                                  "Sacramento", "SanFrancisco"))
+
+regions_cali <- clean_avocado |> 
+  semi_join(regions_cali, by = "region") 
+
+average_price_by_region <- regions_cali |>
+  group_by(region, type) |>
+  summarize(average_price = mean(AveragePrice)) |> 
+  arrange(desc(average_price))
+
+avocado_price_difference <- average_price_by_region |>  
+  pivot_wider(names_from = type, values_from = average_price) |>
+  mutate(difference = organic-conventional) |>
+  arrange(desc(difference))
+
+ggplot(data = average_price_by_region, 
+       aes(x = region, y=average_price, fill=type)) + 
+       geom_line(aes(group = average_price)) + 
+       geom_segment(aes(xend = region,
+                   yend = 0)) +
+  geom_point(aes(color= type)) +
+  labs(x = "Region of CA", y = "Average Price")
 
 ```
 
@@ -419,7 +588,13 @@ I've done this in the following provided assignments:
 -   `across()`
 
 ```{r pe-1-across}
-
+#Lab 3 Q5 (revised the mutate_at)
+hiphop_clean <- hiphop |>
+  mutate(word = as.factor(word),
+         sex = as.factor(sex),
+         ethnic = as.factor(ethnic),
+         across(where(is.numeric), as.factor)) |>
+  drop_na(word, sex, ethnic)
 ```
 
 -   `map()` functions
@@ -433,13 +608,23 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r pe2-1}
-
+#Lab 3 Q5 (revised the mutate_at)
+hiphop_clean <- hiphop |>
+  mutate(word = as.factor(word),
+         sex = as.factor(sex),
+         ethnic = as.factor(ethnic),
+         across(where(is.numeric), as.factor)) |>
+  drop_na(word, sex, ethnic)
 ```
 
 -   Example 2
 
 ```{r pe2-2}
-
+#Lab 3 Q13
+white_men_above_30 <- hiphop_clean |>
+  filter(sex == "Male", 
+         ethnicity == "white", 
+         age > 30) 
 ```
 
 **PE-3:I can use iteration to reduce repetition in my code.**
@@ -447,6 +632,13 @@ I've done this in the following provided assignments:
 -   `across()`
 
 ```{r pe-3-across}
+#Lab 3 Q5 (revised the mutate_at)
+hiphop_clean <- hiphop |>
+  mutate(word = as.factor(word),
+         sex = as.factor(sex),
+         ethnic = as.factor(ethnic),
+         across(where(is.numeric), as.factor)) |>
+  drop_na(word, sex, ethnic)
 
 ```
 
@@ -465,13 +657,31 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r pe-4-1}
+#Lab4 Q7
+avocado_size <- regions_cali |>
+  pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
+               names_to = "Size", values_to = "Volume") |>
+group_by(region, Size, type) |> 
+summarize(volume_sold = sum(Volume))
 
+
+ggplot(data = avocado_size, 
+       mapping = aes(x = region, y = volume_sold, fill = Size)) +
+  geom_bar(position = "fill", stat = "identity") +  
+  scale_x_continuous(labels=scales::percent)+facet_wrap(.~type) + 
+  scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
+  labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
+       fill = "Avocado Size")
 ```
 
 -   Example 2
 
 ```{r pe-4-2}
-
+#Lab 3 Q13
+white_men_above_30 <- hiphop_clean |>
+  filter(sex == "Male", 
+         ethnicity == "white", 
+         age > 30) 
 ```
 
 ## Data Simulation & Modeling
