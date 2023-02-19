@@ -42,8 +42,7 @@ military <- read_xlsx(here::here("data",
 
 ```{r wd-1-txt}
 #Practice activity 5.2 
-message <- read_csv(here::here("scrambled_message.txt")
-                      )
+message <- read_csv(here::here("scrambled_message.txt"))
 ```
 
 **WD-2: I can select necessary columns from a dataset.**
@@ -96,13 +95,10 @@ clean_avocado |>
 -   date
 
 ```{r wd-3-date}
-
 #Pratice exercise 5.1 question 3 
 thanks <- ymd("2018-11-22")
-
 time_frame <- (thanks - days(35)) %--% (thanks + days(35))
-
-suspects <- suspects %>%
+suspects <- suspects |>
   filter(Time.Spotted %within% time_frame)
 ```
 
@@ -124,11 +120,6 @@ hiphop_clean <- hiphop |>
 -   character -- specifically a string
 
 ```{r wd-4-string}
-#practice activity 2 "Decode a message" (revised)
-word_clean <- wordclean |> 
-  str_sub_all(start = 11, end = 16) 
-
-
 #lab 3 question 7 
 hiphop_clean <- hiphop_clean |> 
   mutate(ethnicity = if_else(ethnic == "white", 
@@ -156,7 +147,8 @@ hiphop_clean <- hiphop |>
 summarized_data <- surveys |> 
   mutate(Date = ymd(date))
 
-ggplot(data= summarized_data, aes(x = year, y = weight, color = genus)) +
+ggplot(data= summarized_data, 
+       mapping = aes(x = year, y = weight, color = genus)) +
   geom_line() +
   theme_classic() +
   scale_x_continuous(limits = c(1977, 2002)) +
@@ -234,7 +226,8 @@ highest_five <- clean_avocado |>
   filter(region == metro_regions$region)
 
 
-ggplot(data = highest_five, mapping = aes(x=region, y= `Total Volume`)) + 
+ggplot(data = highest_five, 
+       mapping = aes(x=region, y= `Total Volume`)) + 
   geom_boxplot() + 
   geom_jitter() +
   labs(x="Region", y="Total Average Volume", 
@@ -258,9 +251,11 @@ summarize(volume_sold = sum(Volume))
 ggplot(data = avocado_size, 
        mapping = aes(x = region, y = volume_sold, fill = Size)) +
   geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels=scales::percent)+facet_wrap(.~type) + 
+  scale_x_continuous(labels=scales::percent) + 
+  facet_wrap(.~type) + 
   scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
-  labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
+  labs(x = "Region of CA", 
+       y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
 ```
 
@@ -286,10 +281,9 @@ avocado_price_difference <- average_price_by_region |>
   arrange(desc(difference))
 
 ggplot(data = average_price_by_region, 
-       aes(x = region, y=average_price, fill=type)) + 
+       mapping = aes(x = region, y=average_price, fill=type)) + 
        geom_line(aes(group = average_price)) + 
-       geom_segment(aes(xend = region,
-                   yend = 0)) +
+       geom_segment(aes(xend = region, yend = 0)) +
   geom_point(aes(color= type)) +
   labs(x = "Region of CA", y = "Average Price")
 
@@ -398,7 +392,8 @@ rodents <- surveys |>
   drop_na()
 
 ggplot(data= rodents, 
-       aes(x = reorder(day_of_week, captured_rodents), y = captured_rodents, fill = captured_rodents)) +
+       mapping = aes(x = reorder(day_of_week, captured_rodents), 
+           y = captured_rodents, fill = captured_rodents)) +
   geom_bar(stat = "identity") +
   labs(x = "Day of Week", 
        y = "Number of Rodents", 
@@ -421,7 +416,8 @@ summarize(volume_sold = sum(Volume))
 ggplot(data = avocado_size, 
        mapping = aes(x = region, y = volume_sold, fill = Size)) +
   geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels=scales::percent)+facet_wrap(.~type) + 
+  scale_x_continuous(labels = scales::percent) +
+  facet_wrap(.~type) + 
   scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
   labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
@@ -434,9 +430,11 @@ ggplot(data = avocado_size,
 
 ```{r dvs-3-1}
 #Lab 2 Q14
-ggplot(data = surveys, mapping = aes(x=species, y=weight)) + 
-  geom_boxplot(outlier.shape=NA) + geom_jitter(col="tomato", alpha=0.1) +
-  labs(x="Species", y="Weight", title = "Distribution of weight within each Species")
+ggplot(data = surveys, mapping = aes(x = species, y = weight)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(col = "tomato", alpha = 0.1) +
+  labs(x = "Species", y = "Weight", 
+       title = "Distribution of weight within each Species")
 ```
 
 -   Example 2
@@ -449,7 +447,8 @@ rodents <- surveys |>
   drop_na()
 
 ggplot(data= rodents, 
-       aes(x = reorder(day_of_week, captured_rodents), y = captured_rodents, fill = captured_rodents)) +
+       mapping = aes(x = reorder(day_of_week, captured_rodents), 
+           y = captured_rodents, fill = captured_rodents)) +
   geom_bar(stat = "identity") +
   labs(x = "Day of Week", 
        y = "Number of Rodents", 
@@ -509,8 +508,9 @@ summarize(volume_sold = sum(Volume))
 ggplot(data = avocado_size, 
        mapping = aes(x = region, y = volume_sold, fill = Size)) +
   geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels=scales::percent)+facet_wrap(.~type) + 
-  scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
+  scale_x_continuous(labels = scales::percent)+
+  facet_wrap(.~type) + 
+  scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
   labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
 ```
@@ -534,15 +534,15 @@ average_price_by_region <- regions_cali |>
 
 avocado_price_difference <- average_price_by_region |>  
   pivot_wider(names_from = type, values_from = average_price) |>
-  mutate(difference = organic-conventional) |>
+  mutate(difference = organic - conventional) |>
   arrange(desc(difference))
 
 ggplot(data = average_price_by_region, 
-       aes(x = region, y=average_price, fill=type)) + 
+       mapping = aes(x = region, y = average_price, fill = type)) + 
        geom_line(aes(group = average_price)) + 
        geom_segment(aes(xend = region,
                    yend = 0)) +
-  geom_point(aes(color= type)) +
+  geom_point(aes(color = type)) +
   labs(x = "Region of CA", y = "Average Price")
 
 ```
@@ -668,8 +668,9 @@ summarize(volume_sold = sum(Volume))
 ggplot(data = avocado_size, 
        mapping = aes(x = region, y = volume_sold, fill = Size)) +
   geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels=scales::percent)+facet_wrap(.~type) + 
-  scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
+  scale_x_continuous(labels = scales::percent) +
+  facet_wrap(.~type) + 
+  scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
   labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
 ```
