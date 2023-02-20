@@ -1,0 +1,98 @@
+---
+title: "Practice Activity 2"
+author: "Emily Lo"
+format:
+  html:
+    theme: cerulean
+    self-contained: true
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
+execute: 
+  echo: true
+  errors: true
+  warning: false
+  messages: false
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{message <- read_csv(here::here("week 5","practice activity","scrambled_message.txt"))}
+```
+
+Question 1
+
+892 characters are in the scrambled message
+
+```{r}
+message %>% 
+  mutate(length = str_length(Word)) %>% 
+  summarise(total_length = sum(length))
+
+```
+
+Question 2
+
+127 words are in the scrambled message
+
+```{r}
+message |> 
+  filter(str_detect(Word, pattern = "\\w")) %>% 
+  count() 
+```
+
+Question 3
+
+Print out every piece of a word in the scrambled message that starts with the letter "m".
+
+```{r}
+words <- c(message$Word)
+str_subset(words, pattern = "^m")
+```
+
+Question 4
+
+Print out every piece of a word in the scrambled message that ends with the letter "z"
+
+```{r}
+str_subset(words, pattern = "z$")
+```
+
+Question 5
+
+Print out every punctuation symbol in the scrambled message.
+
+```{r}
+
+words %>% str_extract_all(pattern = "[[:punct:]]") %>%
+  purrr::map(~ data_frame(punctuation = .)) %>%
+  bind_rows()
+
+```
+
+Decode a message
+
+```{r}
+words <- c(message$Word)
+library(stringr)
+words <- str_trim(words)
+
+
+words <- sapply(words, function(x) substr(x, 1, 16))
+
+words <- gsub("ugh[!.?-@]*", "", words, ignore.case = TRUE)
+
+words <- gsub("aa", "ee", words)
+
+words <- gsub("z", "t", words)
+
+words <- gsub("b$", "y", words)
+
+words <- gsub("^k", "v", words)
+
+message <- str_c(words, collapse = " ")
+
+view(message)
+```

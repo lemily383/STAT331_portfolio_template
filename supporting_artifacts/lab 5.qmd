@@ -1,0 +1,205 @@
+---
+title: "Lab 5"
+author: "Emily Lo"
+format:
+  html:
+    theme: cerulean
+    self-contained: true
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
+execute: 
+  echo: true
+  errors: true
+  warning: false
+  messages: false
+---
+
+```{r setup}
+library(tidyverse)
+library(lubridate)
+library(here)
+```
+
+```{r data}
+surveys <- read_csv(here("week 2",
+          "lab 2","surveys.csv"))
+
+```
+
+```{r}
+# Code for question 13! 
+ggplot(data = surveys, 
+      mapping = aes(x = weight, y = species)) +
+      geom_boxplot(outlier.shape = NA) +
+      geom_jitter(col = "tomato", alpha = 0.1) +
+      labs(x = "Weight of animal in grams", 
+        y = " ", 
+        title = "Distribution of weight within each species of rodent")
+```
+
+**1. Reorder the species so the boxplots for weights go in descending order (largest to smallest).**
+
+```{r}
+ggplot(data = surveys, 
+       mapping = aes(x = weight, 
+       y = fct_reorder(species, weight))) +
+       geom_boxplot(outlier.shape = NA) + 
+       geom_jitter(col = "tomato", alpha = 0.1) +
+labs(x = "Weight of animal in grams", 
+     y = " ", 
+     title = "Distribution of weight within each species of rodent")
+
+```
+
+Question 2
+
+```{r}
+ggplot(data = surveys, 
+       mapping = aes(x = weight, 
+      y= fct_reorder(species, weight))) +
+  geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(col = "tomato", alpha = 0.1) +
+labs(x = "Weight of animal in grams", 
+     y= " " , 
+     title = "Distribution of weight within each species of rodent")
+
+```
+
+Time Series Plot
+
+**1. Create a visualization how weights vary for each genus over the duration of the study.**
+
+```{r}
+
+summarized_data <- surveys |> 
+  mutate(date = ymd(date))
+
+ggplot(data = summarized_data, aes(x = year(date), y = weight, color = genus)) +
+  geom_line() +
+  theme_classic() +
+  scale_x_continuous(limits = c(1977, 2002)) +
+  scale_color_discrete(guide = guide_legend(title = "Genus")) +
+  labs(x = "Year", 
+       y = " ", 
+       title = "Variation of Weights(g) for each Genus of Rodent over Time")
+
+```
+
+### **2. Calculate the plot and the mean weight for each genus for each year**
+
+```{r}
+
+summarized_mean <- surveys |> 
+  group_by(genus,year) |> 
+  summarize(mean_weight = mean(weight, na.rm = TRUE))
+
+ggplot(data= summarized_mean, aes(x = year, 
+  y = mean_weight, color = genus)) +
+  geom_line() +
+  theme_classic() +
+  scale_x_continuous(limits = c(1977, 2002)) +
+  scale_color_discrete(guide = guide_legend(title = "Genus")) +
+  labs(x = "Year", 
+       y = " ", 
+       title = "Mean weight(g) for each Genus of Rodent over Time")
+
+```
+
+**3. Reorder the lines so the mean weights go in descending order (largest to smallest).**
+
+```{r}
+ggplot(data= summarized_mean, 
+       mapping = aes(x = year, 
+                     y = mean_weight, 
+                     color = fct_reorder(genus, desc(mean_weight)))) +
+  geom_line() +
+  theme_classic() +
+  scale_x_continuous(limits = c(1977, 2002)) +
+  scale_color_discrete(guide = guide_legend(title = "Genus")) +
+  labs(x = "Year", 
+       y = " ", 
+       title = "Mean weight(g) for each Genus of Rodent over Time")
+```
+
+Question 4
+
+```{r}
+ggplot(data= summarized_mean, 
+       mapping = aes(x = year, 
+                     y = mean_weight, 
+                     color = fct_reorder(genus, desc(mean_weight)))) +
+  geom_line() +
+  theme_classic() +
+  scale_x_continuous(limits = c(1977, 2002)) +
+  scale_color_discrete(guide = guide_legend(title = "Genus")) +
+  labs(x = "Year", 
+       y = "", 
+       title = "Mean weight(g) for each Genus of Rodent over Time")
+```
+
+## **Caputures over the Week**
+
+Question 1: **Create a visualization of the number of rodents captured each day of the week.**
+
+```{r}
+
+rodents <- surveys |> 
+  group_by(day_of_week) |>
+  summarize(captured_rodents = n()) |> 
+  drop_na()
+
+ggplot(data= rodents, 
+       aes(x = reorder(day_of_week, captured_rodents), 
+           y = captured_rodents, fill = captured_rodents)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Day of Week", 
+       y = " ", 
+       title = "Number of Rodents Captured Each Day of the Week") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  theme_classic()
+
+```
+
+I wanted to make this visualization more visually appealing and easier to distinguish between the large numbers so I thought adding a gradient aspect to it would be helpful. I learned about this function through https://ggplot2-book.org/scale-colour.html
+
+Question 2 **Change the order of the day of the week to go Monday through Sunday.**
+
+```{r}
+
+week_order <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+rodents |>
+  mutate(day_of_week = fct_inorder(week_order)) |>
+  ggplot(aes(x = day_of_week, 
+             y = captured_rodents, 
+             fill = captured_rodents)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Day of Week", y = "",
+       title = "Number of Rodents Captured Each Day of the Week") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  theme_classic()
+
+```
+
+I learned to use the order() function in R through https://www.datacamp.com/tutorial/sorting-in-r
+
+Question 3 **Collapse Monday through Friday into a `"Weekday"` level, and collapse Saturday and Sunday into a `"Weekend"` level. Plot the number of rodents captured between the two groups.**
+
+```{r}
+
+week_day_level <- fct_collapse(rodents$day_of_week, 
+      "weekday" = c("Mon", "Tue", "Wed", "Thu", "Fri"),
+      "weekend" = c("Sat", "Sun"))
+
+ggplot(data= rodents, 
+       aes(x = week_day_level, y = captured_rodents, fill = captured_rodents)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Time of Week", 
+       y = "", 
+       title = "Number of Rodents Captured During Weekday and Weekend") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  theme_classic()
+
+
+```
