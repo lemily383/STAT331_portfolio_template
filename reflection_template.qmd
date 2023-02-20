@@ -4,11 +4,17 @@ author: "Emily Lo"
 format: 
   html: 
     self-contained: true
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
 layout: margin-left
 editor: visual
 execute: 
   eval: false
   echo: true
+  errors: true
+  warning: false
+  messages: false
 ---
 
 [**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an B-
@@ -30,7 +36,7 @@ surveys <- read_csv(here("week 2","lab 2","surveys.csv"))
 -   `xlsx`
 
 ```{r wd-1-xlsx}
-#Practice activity 4
+#Practice activity 4 Q1
 military <- read_xlsx(here::here("data", 
                                  "gov_spending_per_capita.xlsx"), 
                       sheet = "Share of Govt. spending", 
@@ -107,7 +113,7 @@ suspects <- suspects |>
 -   numeric
 
 ```{r wd-4-numeric}
-#Lab 3 Q5 (revised)
+#Lab 3 Q5 (revised the mutate_at)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -130,7 +136,7 @@ hiphop_clean <- hiphop_clean |>
 -   factor
 
 ```{r wd-4-factor}
-#Lab 3 Q5 (revised)
+#Lab 3 Q5 (revised the mutate_at)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -202,7 +208,7 @@ clean_avocado |>
 -   `anti_join()`
 
 ```{r wd-6-anti}
-#Lab 4 Q5 (revised)
+#Lab 4 Q5 (revised, slice_max)
 other_regions <- tibble(region = c("California", "NewYork", 
                                    "SouthCarolina", "TotalUS",
                                    "West","GreatLakes",
@@ -214,6 +220,7 @@ metro_regions <- clean_avocado |>
   anti_join(other_regions, by = "region") |>
   group_by(region) |>
   summarize(region_mean = mean(`Total Volume`)) |>
+  slice_max(region_mean, n=5)
 
 highest_five <- clean_avocado |> 
   filter(region == metro_regions$region)
@@ -253,7 +260,7 @@ ggplot(data = avocado_size,
 -   `pivot_wider()`
 
 ```{r wd-7-wide}
-#Lab 4 Q6 (revised)
+#Lab 4 Q6 (revised, reduced number of objects)
 regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
                                   "Sacramento", "SanFrancisco"))
 
@@ -287,7 +294,7 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r r-2-1}
-#Lab 3 Q5 (revised)
+#Lab 3 Q5 (revised, replaced mutate_at)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -346,7 +353,7 @@ least_familiar_words <- white_men_above_30 |>
 -   numeric variables
 
 ```{r dvs-1-num}
-#Lab 2 Q4 (revised)
+#Lab 2 Q4 (revised, added units in title)
  ggplot(data = surveys, 
     mapping = aes(x = weight, y = hindfoot_length)) +  
     geom_point() + 
@@ -541,7 +548,7 @@ ggplot(data = avocado_size,
 -   Example 2
 
 ```{r dvs-5-2}
-#Lab 4 Q6 (revised)
+#Lab 4 Q6 (revised, reduced number of objects)
 regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
                                   "Sacramento", "SanFrancisco"))
 
@@ -614,7 +621,7 @@ distinct(clean_avocado, region)
 -   `across()`
 
 ```{r pe-1-across}
-#Lab 3 Q5 (revised)
+#Lab 3 Q5 (revised, replaced mutate_at)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -658,7 +665,7 @@ white_men_above_30 <- hiphop_clean |>
 -   `across()`
 
 ```{r pe-3-across}
-#Lab 3 Q5 (revised)
+#Lab 3 Q5 (revised, replaced the mutate_at)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -761,6 +768,8 @@ I have used online resources to further develop my understanding and also find n
 <!-- Include an image of feedback you gave that you are proud of (either in a peer review or in Discord) -->
 
 I have always completed my peer reviews in a timely manner, with both positive and constructive feedback referring to specific questions in their labs. In addition, as a proactive and patient team member in my group, I am always actively engaged in group work as I have attended every class period and ensure that we finish assignments together after class, and that team members all have the same understanding of the topics by reviewing the assignment together.
+
+An image of feedback I submitted as a peer review for lab 4.
 
 ```{r}
 knitr::include_graphics("peer_support_evidence.png")
