@@ -273,7 +273,7 @@ final_cali <- clean_avocado |>
   mutate(difference = organic - conventional) |>
   arrange(desc(difference))
 
-ggplot(data = average_price_by_region, 
+ggplot(data = final_cali, 
        aes(x = region, y = average_price, fill = type)) + 
        geom_line(aes(group = average_price)) + 
        geom_segment(aes(xend = region,
@@ -561,7 +561,7 @@ final_cali <- clean_avocado |>
   mutate(difference = organic - conventional) |>
   arrange(desc(difference))
 
-ggplot(data = average_price_by_region, 
+ggplot(data = final_cali, 
        aes(x = region, y = average_price, fill = type)) + 
        geom_line(aes(group = average_price)) + 
        geom_segment(aes(xend = region,

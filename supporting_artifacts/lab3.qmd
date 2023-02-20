@@ -128,8 +128,8 @@ Helpful functions: `distinct()`, `count()`
 
 ```{r}
 # code chunk for Q6
-distinct(hiphop_clean,word)
-count(hiphop_clean_distinct)
+distinct(hiphop_clean, word) |>
+count()
 ```
 
 **7. Make a new variable that re-categorizes `ethnic` into only two groups, "white" and "non-white", to simplify your data.**
