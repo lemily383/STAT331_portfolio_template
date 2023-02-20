@@ -107,7 +107,7 @@ suspects <- suspects |>
 -   numeric
 
 ```{r wd-4-numeric}
-#Lab 3 Q5 (revised the mutate_at)
+#Lab 3 Q5 (revised)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -130,7 +130,7 @@ hiphop_clean <- hiphop_clean |>
 -   factor
 
 ```{r wd-4-factor}
-#Lab 3 Q5 (revised the mutate_at)
+#Lab 3 Q5 (revised)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -145,10 +145,9 @@ hiphop_clean <- hiphop |>
 ```{r wd-4-date}
 #Lab 5 Time Series Q1 
 summarized_data <- surveys |> 
-  mutate(Date = ymd(date))
+  mutate(date = ymd(date))
 
-ggplot(data= summarized_data, 
-       mapping = aes(x = year, y = weight, color = genus)) +
+ggplot(data= summarized_data, aes(x = year(date), y = weight, color = genus)) +
   geom_line() +
   theme_classic() +
   scale_x_continuous(limits = c(1977, 2002)) +
@@ -156,6 +155,7 @@ ggplot(data= summarized_data,
   labs(x = "Year", 
        y = "Weight (grams)", 
        title = "Variation of Weights for each Genus over Time")
+
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
@@ -163,22 +163,18 @@ ggplot(data= summarized_data,
 -   `left_join()`
 
 ```{r wd-5-left}
-prob only used one used in lab 4 
-
 
 ```
 
 -   `right_join()`
 
 ```{r wd-5-right}
-#preview activity 
 
 ```
 
 -   `inner_join()`
 
 ```{r wd-5-inner}
-#preview activiy
 
 
 ```
@@ -186,7 +182,6 @@ prob only used one used in lab 4
 -   `full_join()`
 
 ```{r wd-5-full}
-#preview activity 
 
 ```
 
@@ -207,8 +202,7 @@ clean_avocado |>
 -   `anti_join()`
 
 ```{r wd-6-anti}
-#Lab4 Q5 revised arrange desc into slice_max
-
+#Lab4 Q5 (revised)
 other_regions <- tibble(region = c("California", "NewYork", 
                                    "SouthCarolina", "TotalUS",
                                    "West","GreatLakes",
@@ -262,31 +256,26 @@ ggplot(data = avocado_size,
 -   `pivot_wider()`
 
 ```{r wd-7-wide}
-#Lab 4 Q6
-
+#Lab 4 Q6 (revised)
 regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
                                   "Sacramento", "SanFrancisco"))
 
-regions_cali <- clean_avocado |> 
-  semi_join(regions_cali, by = "region") 
-
-average_price_by_region <- regions_cali |>
+final_cali <- clean_avocado |> 
+  semi_join(regions_cali, by = "region") |>
   group_by(region, type) |>
   summarize(average_price = mean(AveragePrice)) |> 
-  arrange(desc(average_price))
-
-avocado_price_difference <- average_price_by_region |>  
+  arrange(desc(average_price)) |>  
   pivot_wider(names_from = type, values_from = average_price) |>
-  mutate(difference = organic-conventional) |>
+  mutate(difference = organic - conventional) |>
   arrange(desc(difference))
 
 ggplot(data = average_price_by_region, 
-       mapping = aes(x = region, y=average_price, fill=type)) + 
+       aes(x = region, y = average_price, fill = type)) + 
        geom_line(aes(group = average_price)) + 
-       geom_segment(aes(xend = region, yend = 0)) +
-  geom_point(aes(color= type)) +
+       geom_segment(aes(xend = region,
+                   yend = 0)) +
+  geom_point(aes(color = type)) +
   labs(x = "Region of CA", y = "Average Price")
-
 ```
 
 ## Reproducibility
@@ -300,7 +289,7 @@ I've done this in the following provided assignments:
 -   Example 1
 
 ```{r r-2-1}
-#Lab 3 Q5 (revised the mutate_at)
+#Lab 3 Q5 (revised)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -359,25 +348,60 @@ least_familiar_words <- white_men_above_30 |>
 -   numeric variables
 
 ```{r dvs-1-num}
-
+#Lab 2 Q4 (revised)
+ ggplot(data = surveys, 
+    mapping = aes(x = weight, y = hindfoot_length)) +  
+    geom_point() + 
+    labs(x = "Weight", 
+         title = "Relationship between weight(g) and hindfoot length(mm) by Species")
 ```
 
 -   numeric variables and categorical variables
 
 ```{r dvs-2-num-cat}
+#Lab 5 Captures over the week question 1 
+rodents <- surveys |> 
+  group_by(day_of_week) |>
+  summarize(captured_rodents = n()) |> 
+  drop_na()
 
+ggplot(data= rodents, 
+       mapping = aes(x = reorder(day_of_week, captured_rodents), 
+           y = captured_rodents, fill = captured_rodents)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Day of Week", 
+       y = "Number of Rodents", 
+       title = "Number of Rodents Captured Each Day of the Week") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  theme_classic()
 ```
 
 -   categorical variables
 
 ```{r dvs-2-cat}
-
+#Lab 2 Q14
+ggplot(data = surveys, mapping = aes(x = species, y = weight)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(col = "tomato", alpha = 0.1) +
+  labs(x = "Species", y = "Weight", 
+       title = "Distribution of weight within each Species")
 ```
 
 -   dates
 
 ```{r dvs-2-date}
+#Lab 5 time series Q1
+summarized_data <- surveys |> 
+  mutate(date = ymd(date))
 
+ggplot(data= summarized_data, aes(x = year(date), y = weight, color = genus)) +
+  geom_line() +
+  theme_classic() +
+  scale_x_continuous(limits = c(1977, 2002)) +
+  scale_color_discrete(guide = guide_legend(title = "Genus")) +
+  labs(x = "Year", 
+       y = "Weight (grams)", 
+       title = "Variation of Weights for each Genus over Time")
 ```
 
 **DVS-2: I use plot modifications to make my visualization clear to the reader.**
@@ -418,10 +442,10 @@ ggplot(data = avocado_size,
   geom_bar(position = "fill", stat = "identity") +  
   scale_x_continuous(labels = scales::percent) +
   facet_wrap(.~type) + 
-  scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
+  scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
   labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
-
+# I learned about n.ddoge on https://ggplot2.tidyverse.org/reference/guide_axis.html
 ```
 
 **DVS-3: I show creativity in my visualizations**
@@ -455,6 +479,9 @@ ggplot(data= rodents,
        title = "Number of Rodents Captured Each Day of the Week") +
   scale_fill_gradient(low = "lightblue", high = "darkblue") +
   theme_classic()
+
+#I learned about gradients on https://ggplot2.tidyverse.org/reference/scale_gradient.html
+# I added a theme classic after learning about the several different themes on https://ggplot2.tidyverse.org/reference/ggtheme.html
 ```
 
 **DVS-4: I can calculate numerical summaries of variables.**
@@ -518,33 +545,26 @@ ggplot(data = avocado_size,
 -   Example 2
 
 ```{r dvs-5-2}
-#Lab 4 Q6 (not sure if too many objects here and if it relates to question???)
-
-
+#Lab 4 Q6 (revised)
 regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
                                   "Sacramento", "SanFrancisco"))
 
-regions_cali <- clean_avocado |> 
-  semi_join(regions_cali, by = "region") 
-
-average_price_by_region <- regions_cali |>
+final_cali <- clean_avocado |> 
+  semi_join(regions_cali, by = "region") |>
   group_by(region, type) |>
   summarize(average_price = mean(AveragePrice)) |> 
-  arrange(desc(average_price))
-
-avocado_price_difference <- average_price_by_region |>  
+  arrange(desc(average_price)) |>  
   pivot_wider(names_from = type, values_from = average_price) |>
   mutate(difference = organic - conventional) |>
   arrange(desc(difference))
 
 ggplot(data = average_price_by_region, 
-       mapping = aes(x = region, y = average_price, fill = type)) + 
+       aes(x = region, y = average_price, fill = type)) + 
        geom_line(aes(group = average_price)) + 
        geom_segment(aes(xend = region,
                    yend = 0)) +
   geom_point(aes(color = type)) +
   labs(x = "Region of CA", y = "Average Price")
-
 ```
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
@@ -582,13 +602,22 @@ ggplot(data = average_price_by_region,
 -   using a single function call
 
 ```{r pe-1-one-call}
-
+#Lab 4 Q2
+regions_major <- tibble(region = c("West","GreatLakes",
+                                   "Midsouth", "Northeast", 
+                                   "Plains", "SouthCentral", 
+                                   "Southeast"))
+clean_avocado <- avocado |> 
+rename(c("Small/Medium" = "4046", 
+         "Large" = "4225", 
+         "Extra Large" = "4770"))
+distinct(clean_avocado, region)
 ```
 
 -   `across()`
 
 ```{r pe-1-across}
-#Lab 3 Q5 (revised the mutate_at)
+#Lab 3 Q5 (revised)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -632,7 +661,7 @@ white_men_above_30 <- hiphop_clean |>
 -   `across()`
 
 ```{r pe-3-across}
-#Lab 3 Q5 (revised the mutate_at)
+#Lab 3 Q5 (revised)
 hiphop_clean <- hiphop |>
   mutate(word = as.factor(word),
          sex = as.factor(sex),
@@ -673,6 +702,7 @@ ggplot(data = avocado_size,
   scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
   labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
+#I leanred about scale_x_continueous and discrete through https://ggplot2.tidyverse.org/reference/scale_continuous.html
 ```
 
 -   Example 2
@@ -726,3 +756,7 @@ white_men_above_30 <- hiphop_clean |>
 ## Peer Support & Collaboration
 
 <!-- Include an image of feedback you gave that you are proud of (either in a peer review or in Discord) -->
+
+```{r}
+knitr::include_graphics("peer_support_evidence.png")
+```
