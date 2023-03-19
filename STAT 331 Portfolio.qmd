@@ -257,23 +257,28 @@ ggplot(mapping = aes(x = `Total Volume`, y = region)) +
 -   `pivot_longer()`
 
 ```{r wd-7-long}
-#Lab 4 Q7
-avocado_size <- regions_cali |>
-  pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
-               names_to = "Size", values_to = "Volume") |>
-group_by(region, Size, type) |> 
-summarize(volume_sold = sum(Volume))
-
+#Lab 4 Q7 (revised)
+avocado_size <- clean_avocado |>
+  semi_join(regions_cali, by = "region") |>
+  pivot_longer(cols = c("Small/Medium", "Large", "Extra Large"), 
+               names_to = "Size", 
+               values_to = "Volume") |>
+  group_by(region, type, Size) |>
+  summarize(volume_sold = sum(Volume))
 
 ggplot(data = avocado_size, 
-       mapping = aes(x = region, y = volume_sold, fill = Size)) +
-  geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels=scales::percent) + 
+       mapping = aes(x = region, 
+                     y = volume_sold, 
+                     fill = Size)) + 
+  geom_bar(position = "fill", 
+           stat = "identity") + 
   facet_wrap(.~type) + 
-  scale_x_discrete(guide=guide_axis(n.dodge = 3)) + 
+  scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
   labs(x = "Region of CA", 
        y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
+
+# I learned about lables = scales:number_format on https://scales.r-lib.org/reference/number_format.html
 ```
 
 -   `pivot_wider()`
@@ -312,27 +317,18 @@ Challenge 8, Lab 7, Challenge 7
 -   Example 1
 
 ```{r r-2-1}
-#Lab 4 Q5 
-other_regions <- tibble(region = c("California", "NewYork", 
-                                   "SouthCarolina", "TotalUS",
-                                   "West","GreatLakes",
-                                   "Midsouth", "Northeast", 
-                                   "Plains", "SouthCentral", 
-                                   "Southeast"))
-                                   
-top_5 <- clean_avocado |> 
-  anti_join(other_regions, by = "region") |>
-  group_by(region) |>
-  summarize(region_mean = mean(`Total Volume`)) |>
-  slice_max(region_mean, n=5) 
-
-clean_avocado |> 
-semi_join(top_5, by = "region") |>
-ggplot(mapping = aes(x = `Total Volume`, y = region)) + 
-  geom_boxplot() + 
-  geom_jitter() +
-  labs(y="Region", x=" ", 
-       title = "Five Regions with the Highest Averages for the Total Volume Variable")
+#Challenge 8 Step 2
+xmas2 <- xmas |> 
+  mutate(day.num = as.character(english::english(Day)),
+   Full.Phrase = pmap_chr(.l = list(
+           day = Day,
+           num_word = day.num,
+           item = Gift.Item,
+           verb = Verb,
+           adjective = Adjective,
+           location = Location),
+           .f = make_phrase)
+  )
 
 ```
 
@@ -506,23 +502,28 @@ ggplot(data= rodents,
 -   Example 2
 
 ```{r dvs-2-2}
-#Lab 4 Q7 
-avocado_size <- regions_cali |>
-  pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
-               names_to = "Size", values_to = "Volume") |>
-group_by(region, Size, type) |> 
-summarize(volume_sold = sum(Volume))
-
+#Lab 4 Q7 (revised)
+avocado_size <- clean_avocado |>
+  semi_join(regions_cali, by = "region") |>
+  pivot_longer(cols = c("Small/Medium", "Large", "Extra Large"), 
+               names_to = "Size", 
+               values_to = "Volume") |>
+  group_by(region, type, Size) |>
+  summarize(volume_sold = sum(Volume))
 
 ggplot(data = avocado_size, 
-       mapping = aes(x = region, y = volume_sold, fill = Size)) +
-  geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels = scales::percent) +
+       mapping = aes(x = region, 
+                     y = volume_sold, 
+                     fill = Size)) + 
+  geom_bar(position = "fill", 
+           stat = "identity") + 
   facet_wrap(.~type) + 
   scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
-  labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
+  labs(x = "Region of CA", 
+       y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
-# I learned about n.dodge on https://ggplot2.tidyverse.org/reference/guide_axis.html
+
+# I learned about lables = scales:number_format on https://scales.r-lib.org/reference/number_format.html. I learned about n.dodge on https://ggplot2.tidyverse.org/reference/guide_axis.html
 ```
 
 **DVS-3: I show creativity in my visualizations**
@@ -642,22 +643,28 @@ clean_avocado |>
 -   Example 1
 
 ```{r dvs-5-1}
-#Lab 4 Q7 
-avocado_size <- regions_cali |>
-  pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
-               names_to = "Size", values_to = "Volume") |>
-group_by(region, Size, type) |> 
-summarize(volume_sold = sum(Volume))
-
+#Lab 4 Q7 (revised)
+avocado_size <- clean_avocado |>
+  semi_join(regions_cali, by = "region") |>
+  pivot_longer(cols = c("Small/Medium", "Large", "Extra Large"), 
+               names_to = "Size", 
+               values_to = "Volume") |>
+  group_by(region, type, Size) |>
+  summarize(volume_sold = sum(Volume))
 
 ggplot(data = avocado_size, 
-       mapping = aes(x = region, y = volume_sold, fill = Size)) +
-  geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels = scales::percent)+
+       mapping = aes(x = region, 
+                     y = volume_sold, 
+                     fill = Size)) + 
+  geom_bar(position = "fill", 
+           stat = "identity") + 
   facet_wrap(.~type) + 
   scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
-  labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
+  labs(x = "Region of CA", 
+       y = "Proportion of Mean Avocados Sold", 
        fill = "Avocado Size")
+
+# I learned about lables = scales:number_format on https://scales.r-lib.org/reference/number_format.html. I learned about n.dodge on https://ggplot2.tidyverse.org/reference/guide_axis.html
 ```
 
 -   Example 2
