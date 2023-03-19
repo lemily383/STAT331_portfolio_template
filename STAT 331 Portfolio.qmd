@@ -54,10 +54,38 @@ message <- read_csv(here::here("scrambled_message.txt"))
 **WD-2: I can select necessary columns from a dataset.**
 
 ```{r wd-2}
-#Lab 3 Q9 
-demographics <- hiphop_clean |>
-  select(sex, age, ethnic) |>
-  distinct(.keep_all = TRUE) 
+#Challenge 9 Q10
+
+Allan_total_percentage <- cleaned_names |> 
+  filter(Year == 2000,
+         State %in% c("CA","PA"),
+         Name %in% c("Allan", "Alan", "Allen")) |>
+  group_by(State, Name) |>
+  summarize(total = sum(Count), 
+            .groups = "drop") |>
+  mutate(prop = total / sum(total)) |>
+  group_by(State) |>
+  ungroup() |> 
+  select(-total) |>
+  pivot_wider(names_from = Name, 
+              values_from = prop, 
+              values_fill = 0)
+
+Allan_percent_table <- gt(Allan_total_percentage) |>
+  fmt_percent(columns = 2:4, decimals = 2) |>
+  tab_header(
+    title = md("**<span style = 'color:#BA55D3;'>Frequency of Allans</span>**"),
+    subtitle = ("Year: 2000")) |>
+  tab_style(
+    style = list(
+      cell_text(font = "Georgia",
+                weight = "bold",
+                size = "14px",
+                align = "right")),
+    locations = cells_body())
+
+
+Allan_percent_table
 ```
 
 **WD-3: I can filter rows from a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
