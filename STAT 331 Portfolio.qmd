@@ -1117,3 +1117,39 @@ I have used online resources to further develop my understanding and also find n
 I have always completed my peer reviews in a timely manner, with both positive and constructive feedback referring to specific questions in their labs. In addition, as a proactive and patient team member in my group, I am always actively engaged in group work as I have attended every class period and ensure that we finish assignments together after class, and that team members all have the same understanding of the topics by reviewing the assignment together.
 
 An image of feedback I submitted as a peer review for lab 9.
+
+Essays
+
+Growth as a data scientist:
+
+I spent a lot of time on online sites such as https://search.r-project.org/CRAN/refmans/gt/html/tab_style.html where I got a more in depth understanding of the specific function: tab_style from the gt package. With that, I was able to write code for: **DVS-7: I show creativity in my tables.** Example 1 Challenge 9 Q9. I followed this similar process with other new tools we learned in class, and I believe that I have grown and challenged myself.
+
+In addition, I have dedicated time to walk through Kaliegh and Eva outside of class to ensure that their questions are answered. As a proactive and patient team member in my group, I am always actively engaged in group work as I attend class and ensure that we finish assignments together after class, and that team members all have the same understanding of the topics by reviewing the assignment together. As a valuable group member, after each problem in the practice activity, I review the problem, going over: what the problem is asking, how we approached it, and discuss the result we got. This allows all members to be on the same page. Not only have I started interacting with my group partners in class, but I have also foster a friendship.
+
+The power of efficiency:
+
+Efficiency is using the appropriate, well-planned tools and libraries to complete a specific task. Efficiency is an important consideration in statistical computing as it can significantly impact the speed and accuracy of statistical analyses, and ultimately the ability of researchers and analysts to make informed decisions based on data.
+
+I struggled on understanding the differences between the mutating joins: "right_join, left_join, semi_join, anti_join, and full_join" My a-ha moment was when I realized that although either joins may be able to produce the same output, that doesn't necessarily mean that I have used the most efficient and correct tool for the problem. I took time to come to office hours to express my train of thought, and ensure that I am moving in the right track with my thinking. Afterwards, I took time to think about how I would incorporate it, and during this time I would look back at the lecture slides. An example of where I have showed my understanding of joins is in **WD-6: I can use filtering joins to filter rows from a data frame. In Lab 4 Q5 where I was able to use both anti-join and semi-join efficiently.**
+
+Since the midterm portfolio, I have spent an abundant amount of time during school, as I have attended all class periods to absorb as much learning as possible. I have also started to attend office hours to better understand what I am doing wrong, and take time myself afterwards to figure out how to incorporate the things that I learned that I did incorrectly the first time. I believe that better results of my code have been shown by not only obtaining the output/results that I want, but that I use the tools that I have learned in class.
+
+another a-ha moment was when I realized that I was using some superseded functions. This was when I realized that there can possibly be an abundant number of the same function in different forms and types that accomplish the same task. this is when I deeply understood the importance of modern tools and to ensure that I incorporated the most modern tools by testing the function out in the console like "?mutate_at" shows that is superseded. For example, before, I was still using mutate_at and also the incorrect syntax for mutate. An example of where I have used mutate efficiently is in **R-3: I can write robust programs that are resistant to changes in inputs,** Example 1 and also in **PE-1: I can write concise code which does not repeat itself in my example of map() functions.**
+
+Lightning round:
+
+-   If Trenton doesn\'t earn an A, then nobody should, because he attended every class period, actively pays attention, and utilizes with the tools we learned in class.
+
+    Functions was the most difficult part of class because it was hard for me to think about the steps before I start writing my code.
+
+-   What was the easiest part of the class for you? Explain why.
+
+I think making plots were pretty easy for me to understand because it was more straightforward to me and I am a visual learner so I enjoyed it.
+
+-   What part of the class surprised or interested you the most? Explain why.
+
+    The part where this class is a different grading schedule because i don't recall another professor who also does this.
+
+-   Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
+
+coding in R requires a lot of patience, and remember that there is always time to improve
