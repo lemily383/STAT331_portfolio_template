@@ -305,20 +305,34 @@ ggplot(data = final_cali,
 
 I have done this in the following assignments:
 
-Lab 7, Lab 8, Lab 9
+Challenge 8, Lab 7, Challenge 7
 
 **R-2: I can write well documented and tidy code.**
 
 -   Example 1
 
 ```{r r-2-1}
-#Lab 3 Q5 (revised, replaced mutate_at)
-hiphop_clean <- hiphop |>
-  mutate(word = as.factor(word),
-         sex = as.factor(sex),
-         ethnic = as.factor(ethnic),
-         across(where(is.numeric), as.factor)) |>
-  drop_na(word, sex, ethnic)
+#Lab 4 Q5 
+other_regions <- tibble(region = c("California", "NewYork", 
+                                   "SouthCarolina", "TotalUS",
+                                   "West","GreatLakes",
+                                   "Midsouth", "Northeast", 
+                                   "Plains", "SouthCentral", 
+                                   "Southeast"))
+                                   
+top_5 <- clean_avocado |> 
+  anti_join(other_regions, by = "region") |>
+  group_by(region) |>
+  summarize(region_mean = mean(`Total Volume`)) |>
+  slice_max(region_mean, n=5) 
+
+clean_avocado |> 
+semi_join(top_5, by = "region") |>
+ggplot(mapping = aes(x = `Total Volume`, y = region)) + 
+  geom_boxplot() + 
+  geom_jitter() +
+  labs(y="Region", x=" ", 
+       title = "Five Regions with the Highest Averages for the Total Volume Variable")
 
 ```
 
@@ -415,27 +429,14 @@ ggplot(data = rescaled_data, mapping = aes(x = rescaled_length)) +
 -   numeric variables and categorical variables
 
 ```{r dvs-2-num-cat}
-#Lab 4 Q5 (revised)
-other_regions <- tibble(region = c("California", "NewYork", 
-                                   "SouthCarolina", "TotalUS",
-                                   "West","GreatLakes",
-                                   "Midsouth", "Northeast", 
-                                   "Plains", "SouthCentral", 
-                                   "Southeast"))
-                                   
-top_5 <- clean_avocado |> 
-  anti_join(other_regions, by = "region") |>
-  group_by(region) |>
-  summarize(region_mean = mean(`Total Volume`)) |>
-  slice_max(region_mean, n=5) 
-
-clean_avocado |> 
-semi_join(top_5, by = "region") |>
-ggplot(mapping = aes(x = `Total Volume`, y = region)) + 
-  geom_boxplot() + 
-  geom_jitter() +
-  labs(y="Region", x=" ", 
-       title = "Five Regions with the Highest Averages for the Total Volume Variable")
+#Challenge 2
+ggplot(data = surveys, 
+       mapping = aes(x = weight, 
+                     y = species)) + 
+  geom_density_ridges() + 
+       labs(x = "Weight", 
+            y = " ", 
+            title = "Distribution of Weight Within Each Species")
 
 
 ```
@@ -467,7 +468,10 @@ ggplot(data= rodents,
 summarized_data <- surveys |> 
   mutate(date = ymd(date))
 
-ggplot(data= summarized_data, aes(x = year(date), y = weight, color = genus)) +
+ggplot(data = summarized_data, 
+       aes(x = year(date), 
+           y = weight, 
+           color = genus)) +
   geom_line() +
   theme_classic() +
   scale_x_continuous(limits = c(1977, 2002)) +
@@ -483,18 +487,19 @@ ggplot(data= summarized_data, aes(x = year(date), y = weight, color = genus)) +
 
 ```{r dvs-2-1}
 #Lab 5 Captures over the week question 1 
+
 rodents <- surveys |> 
   group_by(day_of_week) |>
   summarize(captured_rodents = n()) |> 
   drop_na()
 
 ggplot(data= rodents, 
-       aes(x = reorder(day_of_week, captured_rodents), 
-           y = captured_rodents, fill = day_of_week)) +
+       aes(x = reorder(day_of_week, 
+                       captured_rodents), 
+           y = captured_rodents)) +
   geom_bar(stat = "identity") +
   labs(x = "Day of Week", 
        y = " ", 
-       fill = "Day of Week",
        title = "Number of Rodents Captured Each Day of the Week") 
 ```
 
@@ -525,19 +530,83 @@ ggplot(data = avocado_size,
 -   Example 1
 
 ```{r dvs-3-1}
-#Lab 7 Challenge
+# Challenge 7 Part 3 
 
+my_palette <- c("#00FFFF", "#90EE90")
 
-
+ggplot(data = fish_visual, 
+       aes(x = year, 
+           y = average_condition_index,
+           color = as.factor(trip))) + 
+  geom_line() + 
+  facet_wrap(~ species, 
+             ncol = 2) + 
+  labs(y = "", 
+       x = "Year") +
+  scale_color_manual(values = my_palette) +
+    labs(title = str_c("Trout Condition Index of ",
+      "<span style = 'color : #00FFFF'>**Trip 1**</span>",
+      " and <span style = 'color:#90EE90'>**Trip 2**</span>"),
+      subtitle = "By Year") +
+  theme_gray() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(size = 0.5, 
+                                 color = "pink"),
+        plot.title = element_markdown(size = 15), 
+        axis.text.y = element_text(size = 12), 
+        plot.background = element_rect(fill = "grey90", color = "black", linewidth = 1), 
+        strip.background = element_rect(colour = "red", 
+                                        fill = "pink"),
+        legend.position = "none")
 ```
 
 -   Example 2
 
 ```{r dvs-3-2}
-#Lab 7
+#Lab 7 Q2.2
+
+my_palette <- c("#00BFFF", "#BA55D3")
 
 
-# I added a theme classic after learning about the several different themes on https://ggplot2.tidyverse.org/reference/ggtheme.html
+fish_missing_visualization <- fishes_data |>  
+  filter(is.na(weight)) |> 
+  select(weight, trip, year, section) |> 
+  mutate(trip = if_else(trip == 1, 
+                        "Trip 1", 
+                        "Trip 2"),
+          year = factor(year, 
+                        levels = 1989:2006))
+
+ggplot(data = fish_missing_visualization, 
+       aes(y = year, 
+           fill = section)) +
+  geom_bar() + 
+  facet_wrap(~trip) + 
+  scale_fill_manual(values = my_palette) +
+  labs(title = str_c("Missing Fish Weights for ",
+  "<span style = 'color:#00BFFF'>**Johnsrud**</span>",
+      " and <span style = 'color:#BA55D3'>**ScottyBrown**</span>",
+   " Section of Blackfoot River by Trip"), 
+       x = "",
+       y = "") +
+  theme_gray() +
+    scale_x_continuous(breaks = seq(0, 400, 25)) +
+  scale_y_discrete(drop = FALSE) + 
+  theme(panel.grid.major = element_line(color = "gray80", 
+                                        size = 0.5),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, 
+                                 color = "gray"),
+        axis.text.y = element_text(size = 10), 
+        legend.position = "none",
+        plot.title = element_markdown(size = 14))
+
+
+# I also learned about adding features to the plot like legend position and grid lines on https://r-graphics.org/recipe-legend-position. 
+# I also learned to change the font size larger on the y-axis to help the reader easily read the different years. I learned this on 
+#https://statisticsglobe.com/change-font-size-of-ggplot2-plot-in-r-axis-text-main-title-legend.
+# I learned about scale_y_discrete(drop = FALSE) to add the years that have no observations on https://ggplot2.tidyverse.org/reference/scale_discrete.html
+
 ```
 
 **DVS-4: I can calculate numerical summaries of variables.**
@@ -545,34 +614,27 @@ ggplot(data = avocado_size,
 -   Example 1
 
 ```{r dvs-4-1}
-#Lab 3 Q13
-white_men_above_30 <- hiphop_clean |>
-  filter(sex == "Male", ethnicity == "white", age > 30) 
+#Challenge 7 Part 3
+fish_visual <- fishes_data |> 
+  group_by(year, 
+           species, 
+           trip) |> 
+  summarize(average_condition_index = mean(condition_index, 
+                                           na.rm = TRUE))
 
-most_familiar_words <- white_men_above_30 |>
-  group_by(word) |>
-  summarize(mean_familiarity = mean(familiarity)) |>
-  slice_max(mean_familiarity, n = 1)
-
-least_familiar_words <- white_men_above_30 |>
-  group_by(word) |>
-  summarize(mean_familiarity = mean(familiarity)) |>
-  slice_min(mean_familiarity, n = 1)
 ```
 
 -   Example 2
 
 ```{r dvs-4-2}
 #Lab 4 Q3
-library(lubridate)
 clean_avocado |> 
   semi_join(regions_major, by = "region") |>
  filter(year == 2017 ,  
           type == "organic") |>
   group_by(region) |>
-  summarise(sum_region = sum(`Small/Medium`)) |>
+  summarize(sum_region = sum(`Small/Medium`)) |>
   slice_max(sum_region)
-
 ```
 
 **DVS-5: I can find summaries of variables across multiple groups.**
@@ -601,7 +663,7 @@ ggplot(data = avocado_size,
 -   Example 2
 
 ```{r dvs-5-2}
-#Lab 4 Q6 (revised, reduced number of objects)
+#Lab 4 Q6 (revised)
 regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
                                   "Sacramento", "SanFrancisco"))
 
@@ -609,19 +671,14 @@ final_cali <- clean_avocado |>
   semi_join(regions_cali, by = "region") |>
   group_by(region, type) |>
   summarize(average_price = mean(AveragePrice)) |> 
-  arrange(desc(average_price)) |>  
   pivot_wider(names_from = type, values_from = average_price) |>
-  mutate(difference = organic - conventional) |>
-  arrange(desc(difference))
+  mutate(difference = organic - conventional)
 
 ggplot(data = final_cali, 
-       aes(x = region, y = average_price, fill = type)) + 
-       geom_line(aes(group = average_price)) + 
-       geom_segment(aes(xend = region,
-                   yend = 0)) +
-  geom_point(aes(color = type)) +
+       aes(x = region, y = difference)) + 
+       geom_col() + 
   labs(x = "Region of CA", y = " ", 
-       title = "Avearge price of organic versus conventional avocados by region")
+       title = "Avearge difference in price of organic versus conventional avocados by region")
 ```
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
@@ -629,13 +686,49 @@ ggplot(data = final_cali,
 -   Example 1
 
 ```{r dvs-6-1}
+# Challenge 9 Q3
 
+cleaned_names_table <- cleaned_names |>
+  filter(Name == "Allison") |>
+  group_by(State, Sex) |>
+  summarize(Count = sum(Count), 
+            .groups = "drop") |>
+  pivot_wider(names_from = Sex, 
+              values_from = Count, 
+              values_fill = 0) |>
+  gt() |>
+  tab_header(
+    title = md("**Frequency Table of Babies Named Allison**"),
+    subtitle = "for 192,825 babies"
+  ) |>
+  cols_label(
+    F = "Female",
+    M = "Male")
+
+cleaned_names_table
 ```
 
 -   Example 2
 
 ```{r dvs-6-2}
+#Challenge 9 Q4
+allison_lm <- lm(total ~ Year, 
+                 data = allison_totals)
 
+allison_tidy_table <- broom::tidy(allison_lm) |>
+  gt() |>
+  tab_header(
+    title = md("**Regression Results Table**")) |> 
+  tab_style(
+    style = list(
+      cell_text(font = "Times", 
+                weight = "lighter", 
+                size = "11px")),
+    locations = cells_body(columns = everything(), 
+                           rows = 1:2)
+  )
+  
+allison_tidy_table
 ```
 
 **DVS-7: I show creativity in my tables.**
@@ -643,13 +736,77 @@ ggplot(data = final_cali,
 -   Example 1
 
 ```{r dvs-7-1}
+#Challenge 9 Q9
+Allan_totals <- cleaned_names |> 
+  filter(Year == 2000,
+         State %in% c("CA","PA"),
+         Name %in% c("Allan", 
+         "Alan", 
+         "Allen")) |>
+  group_by(State, Name) |>
+  summarize(total = sum(Count), 
+            .groups = "drop") |>
+  pivot_wider(names_from = Name, 
+              values_from = total,
+              values_fill = 0)
 
+Allan_table <- gt(Allan_totals) |>
+  tab_header(
+    title = md("**Frequency of Allans**"),
+    subtitle = ("Year: 2000")) |>
+  tab_style(
+    style = list(
+      cell_borders(sides = "all", 
+                   color = "#87CEEB",
+                   weight = px(1.5),
+                   style = "solid"
+                     ),
+      cell_fill(color = "#FFC0CB", alpha = NULL),
+      cell_text(font = "Impact", 
+                weight = "lighter", 
+                size = "14px")),
+    locations = cells_body()) 
+
+Allan_table
+
+# I learned how to tab_style on https://gt.rstudio.com/reference/tab_style.html. I think that it can make your table more creative. 
 ```
 
 -   Example 2
 
 ```{r dvs-7-2}
+#Challenge 9 Q10
 
+Allan_total_percentage <- cleaned_names |> 
+  filter(Year == 2000,
+         State %in% c("CA","PA"),
+         Name %in% c("Allan", "Alan", "Allen")) |>
+  group_by(State, Name) |>
+  summarize(total = sum(Count), 
+            .groups = "drop") |>
+  mutate(prop = total / sum(total)) |>
+  group_by(State) |>
+  ungroup() |> 
+  select(-total) |>
+  pivot_wider(names_from = Name, 
+              values_from = prop, 
+              values_fill = 0)
+
+Allan_percent_table <- gt(Allan_total_percentage) |>
+  fmt_percent(columns = 2:4, decimals = 2) |>
+  tab_header(
+    title = md("**<span style = 'color:#BA55D3;'>Frequency of Allans</span>**"),
+    subtitle = ("Year: 2000")) |>
+  tab_style(
+    style = list(
+      cell_text(font = "Georgia",
+                weight = "bold",
+                size = "14px",
+                align = "right")),
+    locations = cells_body())
+
+
+Allan_percent_table
 ```
 
 ## Program Efficiency
@@ -659,34 +816,66 @@ ggplot(data = final_cali,
 -   using a single function call
 
 ```{r pe-1-one-call}
-#Lab 4 Q2 (revised, correct syntax)
-regions_major <- tibble(region = c("West","GreatLakes",
-                                   "Midsouth", "Northeast", 
-                                   "Plains", "SouthCentral", 
-                                   "Southeast"))
-clean_avocado <- avocado |> 
-rename("Small/Medium" = "4046", 
-         "Large" = "4225", 
-         "Extra Large" = "4770")
+#Challegne 8 Step 3 
+sing_day <- function(dataset, line, phrase_col){
+  
+  # Step 1: Setup the intro line
+  num_word <- english::ordinal(line) 
+  intro <- glue::glue("On the {num_word} day of Christmas, my true love sent to me:")
+
+  # Step 2: Sing the gift phrases
+  phrases <- dataset |> pull( {{phrase_col}} )
+  if (line > 1) {
+    last_phrase <- str_c("and ", phrases[1])
+    phrases <- c(phrases[line:2], last_phrase)
+  }
+  if (line == 1){
+    phrases <- phrases[1]
+  }
+ 
+  lyrics <- str_c(phrases, ifelse(line == 1, "", ","))    
+  lyrics[length(lyrics)] <- str_replace(last(lyrics),",", ".")  
+    
+  lyrics <- str_flatten(lyrics, collapse = "\n")
+  sing_line <- glue::glue("{intro}\n{lyrics}\n\n")
+  
+  return(sing_line)
+}
+
+
+sing_day(dataset = xmas2, 
+         line = 6, 
+         phrase_col = Full.Phrase)
+
+#i learned using "last" from https://www.rdocumentation.org/packages/data.table/versions/1.14.8/topics/last. I also  could of replaced it with lyrics[length(lyrics)]
 ```
 
 -   `across()`
 
 ```{r pe-1-across}
-#Lab 3 Q5 (revised, replaced mutate_at)
-hiphop_clean <- hiphop |>
-  mutate(word = as.factor(word),
-         sex = as.factor(sex),
-         ethnic = as.factor(ethnic),
-         across(where(is.numeric), as.factor)) |>
-  drop_na(word, sex, ethnic)
-
+#Lab 7 Q2.1 (revised)
+fishes_data |>
+  summarize(across(.cols = everything(), 
+                   .fns = ~ sum(is.na(.x))))
+  
 
 ```
 
 -   `map()` functions
 
 ```{r pe-1-map-1}
+#Challenge 8 Step 2
+xmas2 <- xmas |> 
+  mutate(day.num = as.character(english::english(Day)),
+   Full.Phrase = pmap_chr(.l = list(
+           day = Day,
+           num_word = day.num,
+           item = Gift.Item,
+           verb = Verb,
+           adjective = Adjective,
+           location = Location),
+           .f = make_phrase)
+  )
 
 ```
 
@@ -695,23 +884,50 @@ hiphop_clean <- hiphop |>
 -   Example 1
 
 ```{r pe2-1}
-#Lab 3 Q5 (revised the mutate_at)
-hiphop_clean <- hiphop |>
-  mutate(word = as.factor(word),
-         sex = as.factor(sex),
-         ethnic = as.factor(ethnic),
-         across(where(is.numeric), as.factor)) |>
-  drop_na(word, sex, ethnic)
+#Challenge 8 Step 3
+sing_day <- function(dataset, line, phrase_col){
+  
+  # Step 1: Setup the intro line
+  num_word <- english::ordinal(line) 
+  intro <- glue::glue("On the {num_word} day of Christmas, my true love sent to me:")
+
+  # Step 2: Sing the gift phrases
+  phrases <- dataset |> pull( {{phrase_col}} )
+  if (line > 1) {
+    last_phrase <- str_c("and ", phrases[1])
+    phrases <- c(phrases[line:2], last_phrase)
+  }
+  if (line == 1){
+    phrases <- phrases[1]
+  }
+ 
+  lyrics <- str_c(phrases, ifelse(line == 1, "", ","))    
+  lyrics[length(lyrics)] <- str_replace(last(lyrics),",", ".")  
+    
+  lyrics <- str_flatten(lyrics, collapse = "\n")
+  sing_line <- glue::glue("{intro}\n{lyrics}\n\n")
+  
+  return(sing_line)
+}
+
+#i learned using "last" from https://www.rdocumentation.org/packages/data.table/versions/1.14.8/topics/last. I also  could of replaced it with lyrics[length(lyrics)]
 ```
 
 -   Example 2
 
 ```{r pe2-2}
-#Lab 3 Q13
-white_men_above_30 <- hiphop_clean |>
-  filter(sex == "Male", 
-         ethnicity == "white", 
-         age > 30) 
+#Challenge 8 Step 2
+xmas2 <- xmas |> 
+  mutate(day.num = as.character(english::english(Day)),
+   Full.Phrase = pmap_chr(.l = list(
+           day = Day,
+           num_word = day.num,
+           item = Gift.Item,
+           verb = Verb,
+           adjective = Adjective,
+           location = Location),
+           .f = make_phrase)
+  )
 ```
 
 **PE-3:I can use iteration to reduce repetition in my code.**
@@ -719,24 +935,32 @@ white_men_above_30 <- hiphop_clean |>
 -   `across()`
 
 ```{r pe-3-across}
-#Lab 3 Q5 (revised, replaced the mutate_at)
-hiphop_clean <- hiphop |>
-  mutate(word = as.factor(word),
-         sex = as.factor(sex),
-         ethnic = as.factor(ethnic),
-         across(where(is.numeric), as.factor)) |>
-  drop_na(word, sex, ethnic)
-
+#Lab 7 Q2.1
+fishes_data |>
+  summarize(across(.cols = everything(), 
+                   .fns = ~ sum(is.na(.x))))
 ```
 
 -   `map()` functions (Provide 2 Examples)
 
 ```{r pe-3-map-1}
-
+xmas2 <- xmas |> 
+  mutate(day.num = as.character(english::english(Day)),
+   Full.Phrase = pmap_chr(.l = list(
+           day = Day,
+           num_word = day.num,
+           item = Gift.Item,
+           verb = Verb,
+           adjective = Adjective,
+           location = Location),
+           .f = make_phrase)
+  )
 ```
 
 ```{r pe-3-map-2}
-
+map_chr(1:12, ~ sing_day(xmas2, .x, Full.Phrase)) |>
+str_c(collapse = "\n") |>
+  cat()
 ```
 
 **PE-4: I can use modern tools when carrying out my analysis.**
@@ -745,32 +969,23 @@ hiphop_clean <- hiphop |>
 
 ```{r pe-4-1}
 #Lab4 Q7
-avocado_size <- regions_cali |>
-  pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
-               names_to = "Size", values_to = "Volume") |>
-group_by(region, Size, type) |> 
-summarize(volume_sold = sum(Volume))
-
-
-ggplot(data = avocado_size, 
-       mapping = aes(x = region, y = volume_sold, fill = Size)) +
-  geom_bar(position = "fill", stat = "identity") +  
-  scale_x_continuous(labels = scales::percent) +
-  facet_wrap(.~type) + 
-  scale_x_discrete(guide = guide_axis(n.dodge = 3)) + 
-  labs(x = "Region of CA", y = "Proportion of Mean Avocados Sold", 
-       fill = "Avocado Size")
-#I leanred about scale_x_continueous and discrete through https://ggplot2.tidyverse.org/reference/scale_continuous.html
+fishes_data |>
+  summarize(across(.cols = everything(), 
+                   .fns = ~ sum(is.na(.x))))
+  
 ```
 
 -   Example 2
 
 ```{r pe-4-2}
-#Lab 3 Q13
-white_men_above_30 <- hiphop_clean |>
-  filter(sex == "Male", 
-         ethnicity == "white", 
-         age > 30) 
+#Lab 4 Q3
+clean_avocado |> 
+  semi_join(regions_major, by = "region") |>
+ filter(year == 2017 ,  
+          type == "organic") |>
+  group_by(region) |>
+  summarize(sum_region = sum(`Small/Medium`)) |>
+  slice_max(sum_region)
 ```
 
 ## Data Simulation & Modeling
@@ -780,13 +995,37 @@ white_men_above_30 <- hiphop_clean |>
 -   Example 1
 
 ```{r dsm-1-1}
+#practice activity 9.2 simulation
+qnif(p = .95, min = 1.5, max = 3.5)
+qnorm(p = 0.1, mean = 4.6, sd = 0.8)
+dnorm(x = 5, mean = 4.6, sd = 0.8)
+dchisq(x = 5, df = 4)
+weight <- rnorm(n = 100, mean = 4.6, sd = 0.8)
+sum(weight<4)
+
 
 ```
 
 -   Example 2
 
 ```{r dsm-1-2}
+#practice activity 9.2 simulation 
 
+set.seed(1957)
+
+music_man <- function(n_tromb, n_cor, n_reed){
+  
+  trombones <- rnorm(n_tromb, mean = 4.6, sd = 0.8)
+  cornets <- runif(n_cor, min = 1.5, max = 3.5)
+  reeds <- rchisq(n_reed, df = 4)
+  
+  return(sum(trombones) + sum(cornets) + sum(reeds))
+}
+
+my_weights <- map_dbl(.x = 1:1000, 
+                      .f = ~ music_man(n_tromb = 76, n_cor = 110, n_reed = 1035)
+                      ) 
+sum(my_weights < 4532)
 ```
 
 **DSM-2: I can fit a linear regression and extract necessary summary measures.**
@@ -794,13 +1033,32 @@ white_men_above_30 <- hiphop_clean |>
 -   Example 1
 
 ```{r dsm-2-1}
-
+# Practice Activity 9.1 Q2 
+mystery_animal_lm <- lm(weight_after ~ weight_before,
+                        data = mystery_animal)
 ```
 
 -   Example 2
 
 ```{r dsm-2-2}
+# Challenge 9 Q4
+allison_lm <- lm(total ~ Year, 
+                 data = allison_totals)
 
+allison_tidy_table <- broom::tidy(allison_lm) |>
+  gt() |>
+  tab_header(
+    title = md("**Regression Results Table**")) |> 
+  tab_style(
+    style = list(
+      cell_text(font = "Times", 
+                weight = "lighter", 
+                size = "11px")),
+    locations = cells_body(columns = everything(), 
+                           rows = 1:2)
+  )
+  
+allison_tidy_table
 ```
 
 ## Revising My Thinking
@@ -823,8 +1081,4 @@ I have used online resources to further develop my understanding and also find n
 
 I have always completed my peer reviews in a timely manner, with both positive and constructive feedback referring to specific questions in their labs. In addition, as a proactive and patient team member in my group, I am always actively engaged in group work as I have attended every class period and ensure that we finish assignments together after class, and that team members all have the same understanding of the topics by reviewing the assignment together.
 
-An image of feedback I submitted as a peer review for lab 4.
-
-```{r}
-knitr::include_graphics("peer_support_evidence.png")
-```
+An image of feedback I submitted as a peer review for lab 9.
