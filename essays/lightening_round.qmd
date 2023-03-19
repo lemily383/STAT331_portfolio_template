@@ -3,3 +3,19 @@ title: "Lightening Round Essays"
 format: html
 editor: visual
 ---
+
+-   If Trenton doesn\'t earn an A, then nobody should, because he attended every class period, actively pays attention, and utilizes with the tools we learned in class.
+
+    Functions was the most difficult part of class because it was hard for me to think about the steps before I start writing my code.
+
+-   What was the easiest part of the class for you? Explain why.
+
+I think making plots were pretty easy for me to understand because it was more straightforward to me and I am a visual learner so I enjoyed it.
+
+-   What part of the class surprised or interested you the most? Explain why.
+
+    The part where this class is a different grading schedule because i don't recall another professor who also does this.
+
+-   Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
+
+coding in R requires a lot of patience, and remember that there is always time to improve
