@@ -1,0 +1,38 @@
+---
+title: "lab2 challenge"
+author: "Emily Lo"
+format:
+  html:
+    theme: cerulean
+    self-contained: true
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
+execute: 
+  echo: true
+  errors: true
+  warning: false
+  messages: false
+---
+
+## Medium- Ridge Plots
+
+Change the plot you created in q13/14 to a ridge plot
+
+```{r}
+library(here)
+library(tidyverse)
+library(ggridges)
+surveys <- read_csv(here("week 2","lab 2","surveys.csv"))
+```
+
+```{r}
+ggplot(data = surveys, 
+       mapping = aes(x = weight, 
+                     y = species)) + 
+  geom_density_ridges() + 
+       labs(x = "Weight", 
+            y = " ", 
+            title = "Distribution of Weight Within Each Species")
+
+```
