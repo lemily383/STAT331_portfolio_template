@@ -28,8 +28,8 @@ execute:
 -   `csv`
 
 ```{r wd-1-csv}
-#Lab 2 Q1
-surveys <- read_csv(here("week 2","lab 2","surveys.csv"))
+#Lab 4 Q0
+avocado <- read_csv(here("week 4","lab4", "avocado.csv"))
 
 ```
 
@@ -68,9 +68,10 @@ demographics <- hiphop_clean |>
 # Lab 4 Q3
 clean_avocado |> 
   semi_join(regions_major, by = "region") |>
- filter(year == 2017, type == "organic") |>
+ filter(year == 2017 ,  
+          type == "organic") |>
   group_by(region) |>
-  summarise(sum_region = sum(`Small/Medium`)) |>
+  summarize(sum_region = sum(`Small/Medium`)) |>
   slice_max(sum_region)
 ```
 
@@ -112,12 +113,11 @@ suspects <- suspects |>
 
 ```{r wd-4-numeric}
 #Lab 4 Q6 (revised)
-
 regions_cali <- tibble(region = c("LosAngeles","SanDiego", 
                                   "Sacramento", "SanFrancisco"))
 
 final_cali <- clean_avocado |> 
-  right_join(regions_cali, by = "region") |>
+  semi_join(regions_cali, by = "region") |>
   group_by(region, type) |>
   summarize(average_price = mean(AveragePrice)) |> 
   pivot_wider(names_from = type, values_from = average_price) |>
@@ -142,18 +142,18 @@ words <- str_replace_all(words, pattern = "z", replace = "t")
 -   factor
 
 ```{r wd-4-factor}
-#lab 5 Capture over the week Q3 new correct answer
+#lab 5 Capture over the week Q3 (revised)
 
 week_day_level <- fct_collapse(rodents$day_of_week, 
       "weekday" = c("Mon", "Tue", "Wed", "Thu", "Fri"),
       "weekend" = c("Sat", "Sun"))
 
 ggplot(data= rodents, 
-       aes(x = week_day_level, y = captured_rodents, fill = day_of_week)) +
+       aes(x = week_day_level, 
+           y = captured_rodents)) +
   geom_bar(stat = "identity") +
   labs(x = "Time of Week", 
        y = "", 
-       fill = "Day of Week",
        title = "Number of Rodents Captured During Weekday and Weekend")
 
 ```
@@ -165,7 +165,10 @@ ggplot(data= rodents,
 summarized_data <- surveys |> 
   mutate(date = ymd(date))
 
-ggplot(data= summarized_data, aes(x = year(date), y = weight, color = genus)) +
+ggplot(data = summarized_data, 
+       aes(x = year(date), 
+           y = weight, 
+           color = genus)) +
   geom_line() +
   theme_classic() +
   scale_x_continuous(limits = c(1977, 2002)) +
@@ -173,6 +176,7 @@ ggplot(data= summarized_data, aes(x = year(date), y = weight, color = genus)) +
   labs(x = "Year", 
        y = " ", 
        title = "Variation of Weights(g) for each Genus of Rodent over Time")
+
 
 ```
 
@@ -187,7 +191,6 @@ ggplot(data= summarized_data, aes(x = year(date), y = weight, color = genus)) +
 -   `right_join()`
 
 ```{r wd-5-right}
-#Preview Activity 4.3 Q1 
 
 ```
 
@@ -215,16 +218,17 @@ full_join(prof_info, prof_course)
 #lab 4 Q3
 clean_avocado |> 
   semi_join(regions_major, by = "region") |>
- filter(year == 2017, type == "organic") |>
+ filter(year == 2017 ,  
+          type == "organic") |>
   group_by(region) |>
-  summarise(sum_region = sum(`Small/Medium`)) |>
+  summarize(sum_region = sum(`Small/Medium`)) |>
   slice_max(sum_region)
 ```
 
 -   `anti_join()`
 
 ```{r wd-6-anti}
-#Lab 4 Q5 (revised, slice_max, inner_join)
+#Lab 4 Q5 (revised)
 other_regions <- tibble(region = c("California", "NewYork", 
                                    "SouthCarolina", "TotalUS",
                                    "West","GreatLakes",
@@ -232,19 +236,20 @@ other_regions <- tibble(region = c("California", "NewYork",
                                    "Plains", "SouthCentral", 
                                    "Southeast"))
                                    
-metro_regions <- clean_avocado |> 
+top_5 <- clean_avocado |> 
   anti_join(other_regions, by = "region") |>
   group_by(region) |>
   summarize(region_mean = mean(`Total Volume`)) |>
-  slice_max(region_mean, n=5) |>
-  inner_join(clean_avocado, by = "region")
+  slice_max(region_mean, n=5) 
 
-ggplot(data = metro_regions, 
-       mapping = aes(x=region, y= `Total Volume`)) + 
+clean_avocado |> 
+semi_join(top_5, by = "region") |>
+ggplot(mapping = aes(x = `Total Volume`, y = region)) + 
   geom_boxplot() + 
   geom_jitter() +
-  labs(x="Region", y=" ", 
-       title = "five regions with the highest averages for the Total Volume variable")
+  labs(y="Region", x=" ", 
+       title = "Five Regions with the Highest Averages for the Total Volume Variable")
+
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -286,13 +291,12 @@ final_cali <- clean_avocado |>
   mutate(difference = organic - conventional)
 
 ggplot(data = final_cali, 
-       aes(x = region, y = average_price, fill = type)) + 
-       geom_line(aes(group = average_price)) + 
-       geom_segment(aes(xend = region,
-                   yend = 0)) +
-  geom_point(aes(color = type)) +
+       aes(x = region, y = difference)) + 
+       geom_col() + 
   labs(x = "Region of CA", y = " ", 
-       title = "Avearge price of organic versus conventional avocados by region")
+       title = "Avearge difference in price of organic versus conventional avocados by region")
+
+
 ```
 
 ## Reproducibility
@@ -321,11 +325,24 @@ hiphop_clean <- hiphop |>
 -   Example 2
 
 ```{r r-2-2}
-#Lab 3 Q13
-white_men_above_30 <- hiphop_clean |>
-  filter(sex == "Male", 
-         ethnicity == "white", 
-         age > 30) 
+#Lab 7 Q3.1
+rescale_01 <- function(vec){
+  stopifnot(is.vector(vec), 
+            is.numeric(vec), 
+            length(vec) > 1, 
+            !any(is.na(vec)))
+  min <- min(vec, na.rm = TRUE)
+  (vec - min) / (max(vec, na.rm = TRUE) - min)
+}
+
+rescale_01 <- function(vec){
+  stopifnot(is.vector(vec), 
+            is.numeric(vec), 
+            length(vec) > 1)
+  min <- min(vec, na.rm = TRUE)
+  (vec - min) / (max(vec, na.rm = TRUE) - min)
+}
+
 ```
 
 **R-3: I can write robust programs that are resistant to changes in inputs.**
@@ -333,13 +350,38 @@ white_men_above_30 <- hiphop_clean |>
 -   Example 1
 
 ```{r r-3-1}
-#this will come from lab 7 with the functions
+#Lab 7 Q3.5
+rescale_column <- function(data, var) {
+  stopifnot(is.data.frame(data), 
+            is.character(var))
+  data |> 
+    mutate(across(.cols = all_of(var), .fns = ~ rescale_01(.x)))
+}
+
+# I learned about all_of on https://tidyselect.r-lib.org/reference/all_of.html
 ```
 
 -   Example 2
 
 ```{r r-3-2}
-#this will come from lab 7 with the functions
+#Lab 7 Q3.1
+rescale_01 <- function(vec){
+  stopifnot(is.vector(vec), 
+            is.numeric(vec), 
+            length(vec) > 1, 
+            !any(is.na(vec)))
+  min <- min(vec, na.rm = TRUE)
+  (vec - min) / (max(vec, na.rm = TRUE) - min)
+}
+
+rescale_01 <- function(vec){
+  stopifnot(is.vector(vec), 
+            is.numeric(vec), 
+            length(vec) > 1)
+  min <- min(vec, na.rm = TRUE)
+  (vec - min) / (max(vec, na.rm = TRUE) - min)
+}
+
 ```
 
 ## Data Visualization & Summarization
@@ -349,23 +391,52 @@ white_men_above_30 <- hiphop_clean |>
 -   numeric variables
 
 ```{r dvs-1-num}
-#Lab 2 Q4 (revised, added units in title)
- ggplot(data = surveys, 
-    mapping = aes(x = weight, y = hindfoot_length)) +  
-    geom_point() + 
-    labs(x = "Weight", 
-         title = "Relationship between weight(g) and hindfoot length(mm) by Species")
+#Lab 7 Q3.4 (revised)
+
+#| layout-ncol: 1
+ggplot(data = fishes_data, mapping = aes(x = length)) +
+geom_histogram(fill = "purple") +
+  labs(title = "Original Length Values for the Number of Trout",
+       x = "length of trout",
+       y = "")
+
+rescaled_data <- fishes_data |>
+  mutate(rescaled_length = rescale_01(length)) 
+
+ggplot(data = rescaled_data, mapping = aes(x = rescaled_length)) +
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Rescaled Length Values for the Number of Trout",
+       x = "length of trout",
+       y = "")
+
+#quarto.org/docs/interactive/layout.html to learn about the quarto styles for layout-nol:1
 ```
 
 -   numeric variables and categorical variables
 
 ```{r dvs-2-num-cat}
-#Lab 2 Challenge 
-ggplot(data = surveys, 
-       mapping = aes(x = weight, y = species)) +           geom_density_ridges() + 
-       labs(x = "Weight", 
-            y = " ", 
-            title = "Distribution of weight within each Species")
+#Lab 4 Q5 (revised)
+other_regions <- tibble(region = c("California", "NewYork", 
+                                   "SouthCarolina", "TotalUS",
+                                   "West","GreatLakes",
+                                   "Midsouth", "Northeast", 
+                                   "Plains", "SouthCentral", 
+                                   "Southeast"))
+                                   
+top_5 <- clean_avocado |> 
+  anti_join(other_regions, by = "region") |>
+  group_by(region) |>
+  summarize(region_mean = mean(`Total Volume`)) |>
+  slice_max(region_mean, n=5) 
+
+clean_avocado |> 
+semi_join(top_5, by = "region") |>
+ggplot(mapping = aes(x = `Total Volume`, y = region)) + 
+  geom_boxplot() + 
+  geom_jitter() +
+  labs(y="Region", x=" ", 
+       title = "Five Regions with the Highest Averages for the Total Volume Variable")
+
 
 ```
 
@@ -373,18 +444,19 @@ ggplot(data = surveys,
 
 ```{r}
 #Lab 5 Captures over the week question 1 (revised)
+
 rodents <- surveys |> 
   group_by(day_of_week) |>
   summarize(captured_rodents = n()) |> 
   drop_na()
 
 ggplot(data= rodents, 
-       aes(x = reorder(day_of_week, captured_rodents), 
-           y = captured_rodents, fill = day_of_week)) +
+       aes(x = reorder(day_of_week, 
+                       captured_rodents), 
+           y = captured_rodents)) +
   geom_bar(stat = "identity") +
   labs(x = "Day of Week", 
        y = " ", 
-       fill = "Day of Week",
        title = "Number of Rodents Captured Each Day of the Week") 
 ```
 
