@@ -24,7 +24,6 @@ library(here)
 ```{r data}
 surveys <- read_csv(here("week 2",
           "lab 2","surveys.csv"))
-
 ```
 
 ```{r}
@@ -75,7 +74,10 @@ Time Series Plot
 summarized_data <- surveys |> 
   mutate(date = ymd(date))
 
-ggplot(data = summarized_data, aes(x = year(date), y = weight, color = genus)) +
+ggplot(data = summarized_data, 
+       aes(x = year(date), 
+           y = weight, 
+           color = genus)) +
   geom_line() +
   theme_classic() +
   scale_x_continuous(limits = c(1977, 2002)) +
@@ -92,10 +94,13 @@ ggplot(data = summarized_data, aes(x = year(date), y = weight, color = genus)) +
 
 summarized_mean <- surveys |> 
   group_by(genus,year) |> 
-  summarize(mean_weight = mean(weight, na.rm = TRUE))
+  summarize(mean_weight = mean(weight, 
+                               na.rm = TRUE))
 
-ggplot(data= summarized_mean, aes(x = year, 
-  y = mean_weight, color = genus)) +
+ggplot(data= summarized_mean, 
+       aes(x = year, 
+           y = mean_weight, 
+           color = genus)) +
   geom_line() +
   theme_classic() +
   scale_x_continuous(limits = c(1977, 2002)) +
@@ -112,29 +117,14 @@ ggplot(data= summarized_mean, aes(x = year,
 ggplot(data= summarized_mean, 
        mapping = aes(x = year, 
                      y = mean_weight, 
-                     color = fct_reorder(genus, desc(mean_weight)))) +
+                     color = fct_reorder(genus, 
+                                         desc(mean_weight)))) +
   geom_line() +
   theme_classic() +
   scale_x_continuous(limits = c(1977, 2002)) +
   scale_color_discrete(guide = guide_legend(title = "Genus")) +
   labs(x = "Year", 
        y = " ", 
-       title = "Mean weight(g) for each Genus of Rodent over Time")
-```
-
-Question 4
-
-```{r}
-ggplot(data= summarized_mean, 
-       mapping = aes(x = year, 
-                     y = mean_weight, 
-                     color = fct_reorder(genus, desc(mean_weight)))) +
-  geom_line() +
-  theme_classic() +
-  scale_x_continuous(limits = c(1977, 2002)) +
-  scale_color_discrete(guide = guide_legend(title = "Genus")) +
-  labs(x = "Year", 
-       y = "", 
        title = "Mean weight(g) for each Genus of Rodent over Time")
 ```
 
@@ -150,18 +140,14 @@ rodents <- surveys |>
   drop_na()
 
 ggplot(data= rodents, 
-       aes(x = reorder(day_of_week, captured_rodents), 
-           y = captured_rodents, fill = captured_rodents)) +
+       aes(x = reorder(day_of_week, 
+                       captured_rodents), 
+           y = captured_rodents)) +
   geom_bar(stat = "identity") +
   labs(x = "Day of Week", 
        y = " ", 
-       title = "Number of Rodents Captured Each Day of the Week") +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
-  theme_classic()
-
+       title = "Number of Rodents Captured Each Day of the Week") 
 ```
-
-I wanted to make this visualization more visually appealing and easier to distinguish between the large numbers so I thought adding a gradient aspect to it would be helpful. I learned about this function through https://ggplot2-book.org/scale-colour.html
 
 Question 2 **Change the order of the day of the week to go Monday through Sunday.**
 
@@ -172,17 +158,14 @@ week_order <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 rodents |>
   mutate(day_of_week = fct_inorder(week_order)) |>
   ggplot(aes(x = day_of_week, 
-             y = captured_rodents, 
-             fill = captured_rodents)) +
+             y = captured_rodents)) +
   geom_bar(stat = "identity") +
-  labs(x = "Day of Week", y = "",
-       title = "Number of Rodents Captured Each Day of the Week") +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
-  theme_classic()
+  labs(x = "Day of Week", y = "", 
+       title = "Number of Rodents Captured Each Day of the Week") 
 
 ```
 
-I learned to use the order() function in R through https://www.datacamp.com/tutorial/sorting-in-r
+I learned to use the fct_inorder() function in R through https://www.datacamp.com/tutorial/sorting-in-r
 
 Question 3 **Collapse Monday through Friday into a `"Weekday"` level, and collapse Saturday and Sunday into a `"Weekend"` level. Plot the number of rodents captured between the two groups.**
 
@@ -193,13 +176,11 @@ week_day_level <- fct_collapse(rodents$day_of_week,
       "weekend" = c("Sat", "Sun"))
 
 ggplot(data= rodents, 
-       aes(x = week_day_level, y = captured_rodents, fill = captured_rodents)) +
+       aes(x = week_day_level, 
+           y = captured_rodents)) +
   geom_bar(stat = "identity") +
   labs(x = "Time of Week", 
        y = "", 
-       title = "Number of Rodents Captured During Weekday and Weekend") +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
-  theme_classic()
-
+       title = "Number of Rodents Captured During Weekday and Weekend")
 
 ```

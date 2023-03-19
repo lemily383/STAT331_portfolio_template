@@ -1,0 +1,231 @@
+---
+title: "Challenge 9"
+author: "Emily Lo"
+format:
+  html:
+    theme: cerulean
+    self-contained: true
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
+execute: 
+  echo: true
+  errors: true
+  warning: false
+  messages: false
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(dplyr)
+library(tidyr)
+library(broom)
+library(gt)
+library(glue)
+library(DT)
+library(janitor)
+```
+
+```{r}
+names <- read_csv(here("week 9", "lab 9", "StateNames_A.csv"))
+```
+
+## **3 Summarizing & Visualizing the Number of Allisons**
+
+```{r}
+#data cleaning
+cleaned_names <- names |>
+  rename(Sex = Gender)
+datatable(cleaned_names)
+
+```
+
+```{r}
+
+cleaned_names_table <- cleaned_names |>
+  filter(Name == "Allison") |>
+  group_by(State, Sex) |>
+  summarize(Count = sum(Count), 
+            .groups = "drop") |>
+  pivot_wider(names_from = Sex, 
+              values_from = Count, 
+              values_fill = 0) |>
+  gt() |>
+  tab_header(
+    title = md("**Frequency Table of Babies Named Allison**"),
+    subtitle = "for 192,825 babies"
+  ) |>
+  cols_label(
+    F = "Female",
+    M = "Male")
+
+cleaned_names_table
+```
+
+2.  You should have seen in the table above that "Allison" is a name given overwhelmingly to babies assigned "female" at birth. So, create a new dataset named `allison_f` which contains **only** the babies assigned `F`emale at birth.
+
+```{r}
+allison_f <- cleaned_names |>
+  filter(Name == "Allison", 
+         Sex == "F")
+```
+
+3.  Make a visualization showing how the popularity of the name "Allison" has changed over the years. To be clear, each year should have **one** observation--the total number of Allisons born that year.
+
+```{r}
+allison_totals <- allison_f |> 
+  group_by(Year) |>
+  summarize(total = sum(Count))
+
+ggplot(data = allison_totals, 
+       mapping = aes(x = Year, 
+                     y = total)) +
+geom_line() +
+  labs(title = "Popularity Total of the Name Allisons Over the years",
+       x = "Year",
+       y = "")
+```
+
+## **4 Modeling the Number of Allisons**
+
+Fit a linear model with the year as the explanatory variable, and the number of Allisons as the response. Similar to #3, each year should have **one** observation--the total number of Allisons born that year.
+
+```{r}
+allison_lm <- lm(total ~ Year, 
+                 data = allison_totals)
+
+allison_tidy_table <- broom::tidy(allison_lm) |>
+  gt() |>
+  tab_header(
+    title = md("**Regression Results Table**")) |> 
+  tab_style(
+    style = list(
+      cell_text(font = "Times", 
+                weight = "lighter", 
+                size = "11px")),
+    locations = cells_body(columns = everything(), 
+                           rows = 1:2)
+  )
+  
+allison_tidy_table
+```
+
+5.  Predicted total Allisons = -102(Year) + 209690
+6.  
+
+```{r}
+allison_residual <- augment(allison_lm, 
+                            newdata = allison_totals) 
+
+ggplot(data = allison_residual, 
+       mapping = aes(x = Year, 
+                     y = .resid)) + 
+  geom_point() +
+  labs(title = "Residuals of the Total Allisons over the Years",
+       x = "Year",
+       y = "")
+```
+
+For the earlier years, residuals are higher, meaning that we may have under-predicted the popularity of the name Allison. For later years, residuals are lower, meaning that we may have over-predicted the popularity of the name Allison
+
+7.  I conclude that your name's popularity has been decreasing from 1998 to 2005 and increased a bit from 2005 to 2009 and decreased again from 2009 to 2014. Your name is not as popular as it was in the earlier years.
+
+8.  
+
+```{r}
+
+Name_order <- c("Alan", "Allen", "Allan")
+
+male_names_totals <- cleaned_names |> 
+  filter(Name %in% c("Allen", 
+         "Alan", 
+         "Allan")) |>
+  group_by(Name, Year) |>
+  summarize(total = sum(Count)) |>
+
+mutate(Name = factor(Name, 
+                     levels = Name_order))
+ggplot(data = male_names_totals, 
+       mapping = aes(x = Year, 
+                     y = total, 
+                     color = Name)) + 
+  geom_line() +
+  labs(title = "Popularity Total of the Names: Allan, Alan, and Allen Over the Years",
+       x = "Year",
+       y = "")
+```
+
+9.  
+
+```{r}
+Allan_totals <- cleaned_names |> 
+  filter(Year == 2000,
+         State %in% c("CA","PA"),
+         Name %in% c("Allan", 
+         "Alan", 
+         "Allen")) |>
+  group_by(State, Name) |>
+  summarize(total = sum(Count), 
+            .groups = "drop") |>
+  pivot_wider(names_from = Name, 
+              values_from = total,
+              values_fill = 0)
+
+Allan_table <- gt(Allan_totals) |>
+  tab_header(
+    title = md("**Frequency of Allans**"),
+    subtitle = ("Year: 2000")) |>
+  tab_style(
+    style = list(
+      cell_borders(sides = "all", 
+                   color = "#87CEEB",
+                   weight = px(1.5),
+                   style = "solid"
+                     ),
+      cell_fill(color = "#FFC0CB", alpha = NULL),
+      cell_text(font = "Impact", 
+                weight = "lighter", 
+                size = "14px")),
+    locations = cells_body()) 
+
+Allan_table
+
+# I learned how to tab_style on https://gt.rstudio.com/reference/tab_style.html. I think that it can make your table more creative. 
+```
+
+10\.
+
+```{r}
+
+Allan_total_percentage <- cleaned_names |> 
+  filter(Year == 2000,
+         State %in% c("CA","PA"),
+         Name %in% c("Allan", "Alan", "Allen")) |>
+  group_by(State, Name) |>
+  summarize(total = sum(Count), 
+            .groups = "drop") |>
+  mutate(prop = total / sum(total)) |>
+  group_by(State) |>
+  ungroup() |> 
+  select(-total) |>
+  pivot_wider(names_from = Name, 
+              values_from = prop, 
+              values_fill = 0)
+
+Allan_percent_table <- gt(Allan_total_percentage) |>
+  fmt_percent(columns = 2:4, decimals = 2) |>
+  tab_header(
+    title = md("**<span style = 'color:#BA55D3;'>Frequency of Allans</span>**"),
+    subtitle = ("Year: 2000")) |>
+  tab_style(
+    style = list(
+      cell_text(font = "Georgia",
+                weight = "bold",
+                size = "14px",
+                align = "right")),
+    locations = cells_body())
+
+
+Allan_percent_table
+```

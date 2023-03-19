@@ -1,0 +1,116 @@
+---
+title: "Challenge 7"
+author: "Emily Lo"
+format:
+  html:
+    theme: cerulean
+    self-contained: true
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
+execute: 
+  echo: true
+  errors: true
+  warning: false
+  messages: false
+---
+
+Reading the data
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggtext)
+```
+
+```{r}
+fishes_data <- read_csv(here("week 7","lab 7","BlackfootFish.csv"))
+```
+
+Part 1 : Use your function to modify the `length` and `weight` columns of the `BlackfootFish` dataset, removing values you believe are "unreasonable.
+
+```{r}
+#used this code to find unreasonable values
+fishes_data |> ggplot(aes(x=weight)) + 
+  geom_histogram()
+
+```
+
+```{r}
+
+impossible_fixer <- function(data, min, max) {
+  clean_data <- case_when(
+    data < min ~ NA_real_,
+    data > max ~ NA_real_,
+    TRUE ~ data)
+  return(clean_data)}
+
+fishes_data <- fishes_data |> 
+  mutate(length = impossible_fixer(data = length,
+                                        min = 100, 
+                                        max = 500),
+         weight = impossible_fixer(data= weight,
+                                        min = 100, 
+                                        max = 1000))
+
+```
+
+```{r}
+fishes_data <- fishes_data |>
+  mutate(length_mm = length * 25.4, 
+         weight_grams = weight * 453.592)
+  
+```
+
+Part 2: Write a function which calculates the condition index of a fish, given inputs of weight and length.
+
+```{r}
+fish_condition_index <- function(weight, length) {
+return(weight/length^3 * 100)}
+  
+fishes_data <- fishes_data |>
+  mutate(condition_index = fish_condition_index(weight_grams, 
+                                                length_mm))
+
+```
+
+Part 3: Make a thoughtful visualization of how fish conditions have varied over the duration of this study.
+
+```{r}
+fish_visual <- fishes_data |> 
+  group_by(year, 
+           species, 
+           trip) |> 
+  summarize(average_condition_index = mean(condition_index, 
+                                           na.rm = TRUE))
+
+```
+
+```{r}
+my_palette <- c("#00FFFF", "#90EE90")
+
+ggplot(data = fish_visual, 
+       aes(x = year, 
+           y = average_condition_index,
+           color = as.factor(trip))) + 
+  geom_line() + 
+  facet_wrap(~ species, 
+             ncol = 2) + 
+  labs(y = "", 
+       x = "Year") +
+  scale_color_manual(values = my_palette) +
+    labs(title = str_c("Trout Condition Index of ",
+      "<span style = 'color : #00FFFF'>**Trip 1**</span>",
+      " and <span style = 'color:#90EE90'>**Trip 2**</span>"),
+      subtitle = "By Year") +
+  theme_gray() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(size = 0.5, 
+                                 color = "pink"),
+        plot.title = element_markdown(size = 15), 
+        axis.text.y = element_text(size = 12), 
+        plot.background = element_rect(fill = "grey90", color = "black", linewidth = 1), 
+        strip.background = element_rect(colour = "red", 
+                                        fill = "pink"),
+        legend.position = "none")
+```

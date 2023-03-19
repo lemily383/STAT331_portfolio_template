@@ -40,12 +40,10 @@ regions_major <- tibble(region = c("West","GreatLakes",
                                    "Plains", "SouthCentral", 
                                    "Southeast"))
 
-clean_avocado <- avocado |> 
-rename(c("Small/Medium" = "4046", 
+clean_avocado <- avocado |>
+rename("Small/Medium" = "4046", 
          "Large" = "4225", 
-         "Extra Large" = "4770"))
-
-distinct(clean_avocado, region)
+         "Extra Large" = "4770")
 ```
 
 ## Summarizing Avocado Sales
@@ -60,7 +58,7 @@ clean_avocado |>
  filter(year == 2017 ,  
           type == "organic") |>
   group_by(region) |>
-  summarise(sum_region = sum(`Small/Medium`)) |>
+  summarize(sum_region = sum(`Small/Medium`)) |>
   slice_max(sum_region)
 ```
 
@@ -87,21 +85,20 @@ other_regions <- tibble(region = c("California", "NewYork",
                                    "Plains", "SouthCentral", 
                                    "Southeast"))
                                    
-metro_regions <- clean_avocado |> 
+top_5 <- clean_avocado |> 
   anti_join(other_regions, by = "region") |>
   group_by(region) |>
   summarize(region_mean = mean(`Total Volume`)) |>
-  slice_max(region_mean, n=5)
+  slice_max(region_mean, n=5) 
 
-highest_five <- clean_avocado |> 
-  filter(region == metro_regions$region)
-
-ggplot(data = highest_five, 
-       mapping = aes(x=region, y= `Total Volume`)) + 
+clean_avocado |> 
+semi_join(top_5, by = "region") |>
+ggplot(mapping = aes(x = `Total Volume`, y = region)) + 
   geom_boxplot() + 
   geom_jitter() +
-  labs(x="Region", y=" ", 
-       title = "five regions with the highest averages for the Total Volume variable")
+  labs(y="Region", x=" ", 
+       title = "Five Regions with the Highest Averages for the Total Volume Variable")
+
 ```
 
 **\
@@ -117,26 +114,22 @@ final_cali <- clean_avocado |>
   semi_join(regions_cali, by = "region") |>
   group_by(region, type) |>
   summarize(average_price = mean(AveragePrice)) |> 
-  arrange(desc(average_price)) |>  
   pivot_wider(names_from = type, values_from = average_price) |>
-  mutate(difference = organic - conventional) |>
-  arrange(desc(difference))
+  mutate(difference = organic - conventional)
 
 ggplot(data = final_cali, 
-       aes(x = region, y = average_price, fill = type)) + 
-       geom_line(aes(group = average_price)) + 
-       geom_segment(aes(xend = region,
-                   yend = 0)) +
-  geom_point(aes(color = type)) +
+       aes(x = region, y = difference)) + 
+       geom_col() + 
   labs(x = "Region of CA", y = " ", 
-       title = "Avearge price of organic versus conventional avocados by region")
+       title = "Avearge difference in price of organic versus conventional avocados by region")
 
 ```
 
 **7.** The following plot shows, for all four California regions, the proportion of the mean Hass avocado sales that are small, large, or extra large; conventional vs. organic. Recreate the plot.
 
-```{r}
-avocado_size <- regions_cali |>
+```{r} eval: false}
+
+avocado_size <- final_cali |>
   pivot_longer(cols = c(`Small/Medium`,`Large`, `Extra Large`), 
                names_to = "Size", values_to = "Volume") |>
 group_by(region, Size, type) |> 

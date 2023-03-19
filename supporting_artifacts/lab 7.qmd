@@ -1,0 +1,160 @@
+---
+title: "Lab 7"
+author: "Emily Lo"
+format:
+  html:
+    theme: cerulean
+    self-contained: true
+    code-overflow: wrap
+    code-tools: true
+    code-fold: true
+execute: 
+  echo: true
+  errors: true
+  warning: false
+  messages: false
+---
+
+## 1 Reading the data
+
+```{r}
+library(tidyverse)
+library(here)
+library(dplyr)
+library(ggtext)
+library(scales)
+```
+
+```{r}
+fishes_data <- read_csv(here("week 7", "lab 7", "BlackfootFish.csv"))
+```
+
+## 2.1 Summarizing missing data
+
+```{r}
+fishes_data |>
+  summarize(across(.cols = everything(), 
+                   .fns = ~ sum(is.na(.x))))
+  
+```
+
+The weight variable has missing values present. There are 1796 missing values within the weight variable.
+
+## 2.2 Visualizing missing data
+
+```{r}
+my_palette <- c("#00BFFF", "#BA55D3")
+
+
+fish_missing_visualization <- fishes_data |>  
+  filter(is.na(weight)) |> 
+  select(weight, trip, year, section) |> 
+  mutate(trip = if_else(trip == 1, 
+                        "Trip 1", 
+                        "Trip 2"),
+          year = factor(year, 
+                        levels = 1989:2006))
+
+ggplot(data = fish_missing_visualization, 
+       aes(y = year, 
+           fill = section)) +
+  geom_bar() + 
+  facet_wrap(~trip) + 
+  scale_fill_manual(values = my_palette) +
+  labs(title = str_c("Missing Fish Weights for ",
+  "<span style = 'color:#00BFFF'>**Johnsrud**</span>",
+      " and <span style = 'color:#BA55D3'>**ScottyBrown**</span>",
+   " Section of Blackfoot River by Trip"), 
+       x = "",
+       y = "") +
+  theme_gray() +
+    scale_x_continuous(breaks = seq(0, 400, 25)) +
+  scale_y_discrete(drop = FALSE) + 
+  theme(panel.grid.major = element_line(color = "gray80", 
+                                        size = 0.5),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, 
+                                 color = "gray"),
+        axis.text.y = element_text(size = 10), 
+        legend.position = "none",
+        plot.title = element_markdown(size = 14))
+
+
+# I also learned about adding features to the plot like legend position and grid lines on https://r-graphics.org/recipe-legend-position. 
+# I also learned to change the font size larger on the y-axis to help the reader easily read the different years. I learned this on 
+#https://statisticsglobe.com/change-font-size-of-ggplot2-plot-in-r-axis-text-main-title-legend.
+# I learned about scale_y_discrete(drop = FALSE) to add the years that have no observations on https://ggplot2.tidyverse.org/reference/scale_discrete.html
+
+```
+
+# **3 Part Two: Adjusting the Data (Function Writing)**
+
+3.1 Writing a function
+
+```{r}
+rescale_01 <- function(vec){
+  stopifnot(is.vector(vec), 
+            is.numeric(vec), 
+            length(vec) > 1, 
+            !any(is.na(vec)))
+  min <- min(vec, na.rm = TRUE)
+  (vec - min) / (max(vec, na.rm = TRUE) - min)
+}
+
+rescale_01 <- function(vec){
+  stopifnot(is.vector(vec), 
+            is.numeric(vec), 
+            length(vec) > 1)
+  min <- min(vec, na.rm = TRUE)
+  (vec - min) / (max(vec, na.rm = TRUE) - min)
+}
+
+```
+
+3.3 Performing a simple test
+
+```{r}
+x <- c(1:85, NA)
+rescale_01(x)
+```
+
+3.4 Performing a more difficult test
+
+```{r}
+#| layout-ncol: 1
+ggplot(data = fishes_data, mapping = aes(x = length)) +
+geom_histogram(fill = "purple") +
+  labs(title = "Original Length Values for the Number of Trout",
+       x = "length of trout",
+       y = "")
+
+rescaled_data <- fishes_data |>
+  mutate(rescaled_length = rescale_01(length)) 
+
+ggplot(data = rescaled_data, mapping = aes(x = rescaled_length)) +
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Rescaled Length Values for the Number of Trout",
+       x = "length of trout",
+       y = "")
+
+#quarto.org/docs/interactive/layout.html to learn about the quarto styles for layout-nol:1
+```
+
+3.5 Incorporating variables
+
+```{r}
+rescale_column <- function(data, var) {
+  stopifnot(is.data.frame(data), 
+            is.character(var))
+  data |> 
+    mutate(across(.cols = all_of(var), .fns = ~ rescale_01(.x)))
+}
+
+# I learned about all_of on https://tidyselect.r-lib.org/reference/all_of.html
+```
+
+3.6 Another function test
+
+```{r}
+rescale_column(fishes_data, c("length", "weight"))
+```

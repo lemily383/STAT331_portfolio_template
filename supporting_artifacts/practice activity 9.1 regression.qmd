@@ -1,0 +1,47 @@
+---
+title: "practice activity 9.1 regression"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(dplyr)
+```
+
+# **1 Data**
+
+The dataset [mystery_animal.csv](https://atheobold.github.io/stat-331/9_simulation-regression/Practice%20Activity/mystery_animal.csv) contains the weights of a particular animal before and after a year of eating only roasted duck.
+
+```{r}
+mystery_animal <- read_csv(here("week 9", 
+                                "practice activity", 
+                                "mystery_animal.csv"))
+```
+
+# **2 Linear Regression**
+
+Fit a linear regression to determine if the duck diet is associated with the animal gaining weight, losing weight, or neither.
+
+```{r}
+mystery_animal_lm <- lm(weight_after ~ weight_before,
+                        data = mystery_animal)
+```
+
+# **3 Residuals**
+
+Plot the residuals (observed value minus predicted value) of your linear model versus `weight_before`.
+
+```{r}
+mystery_animal_lm |>
+  broom::augment() |>
+  ggplot(mapping = aes(y = .resid, x = .fitted)) +
+  geom_point()
+```
+
+# **4 Mystery Animal**
+
+What animal do you see?
+
+shark
