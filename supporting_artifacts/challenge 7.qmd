@@ -24,14 +24,14 @@ library(ggtext)
 ```
 
 ```{r}
-fishes_data <- read_csv(here("week 7","lab 7","BlackfootFish.csv"))
+fishes_data <- read_csv(here("week 7", "lab 7", "BlackfootFish.csv"))
 ```
 
 Part 1 : Use your function to modify the `length` and `weight` columns of the `BlackfootFish` dataset, removing values you believe are "unreasonable.
 
 ```{r}
 #used this code to find unreasonable values
-fishes_data |> ggplot(aes(x=weight)) + 
+fishes_data |> ggplot(aes(x = weight)) + 
   geom_histogram()
 
 ```
@@ -49,7 +49,7 @@ fishes_data <- fishes_data |>
   mutate(length = impossible_fixer(data = length,
                                         min = 100, 
                                         max = 500),
-         weight = impossible_fixer(data= weight,
+         weight = impossible_fixer(data = weight,
                                         min = 100, 
                                         max = 1000))
 

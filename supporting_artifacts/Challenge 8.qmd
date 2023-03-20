@@ -44,7 +44,7 @@ Using the skeleton of the `pluralize_gift()` function, complete the code so that
 # Return -- A string or vector of strings with the pluralized words
 pluralize_gift <- function(gift){
   gift <- case_when(
-    str_detect(gift,"y$") ~ 
+    str_detect(gift, "y$") ~ 
       str_replace(gift, pattern = "y$", replace = "ies"),
     str_detect(gift, "oo") ~ 
       str_replace(gift, pattern = "oo", replace = "ee"),
@@ -156,7 +156,7 @@ sing_day <- function(dataset, line, phrase_col){
   }
  
   lyrics <- str_c(phrases, ifelse(line == 1, "", ","))    
-  lyrics[length(lyrics)] <- str_replace(last(lyrics),",", ".")  
+  lyrics[length(lyrics)] <- str_replace(last(lyrics), ",", ".")  
     
   lyrics <- str_flatten(lyrics, collapse = "\n")
   sing_line <- glue::glue("{intro}\n{lyrics}\n\n")
