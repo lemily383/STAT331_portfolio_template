@@ -54,7 +54,7 @@ message <- read_csv(here::here("scrambled_message.txt"))
 **WD-2: I can select necessary columns from a dataset.**
 
 ```{r wd-2}
-#Challenge 9 Q10
+#Challenge 9 Q10 (revised)
 
 Allan_total_percentage <- cleaned_names |> 
   filter(Year == 2000,
@@ -388,7 +388,7 @@ rescale_01 <- function(vec){
 -   Example 1
 
 ```{r r-3-1}
-#Lab 7 Q3.5
+#Lab 7 Q3.5 (revised)
 rescale_column <- function(data, var) {
   stopifnot(is.data.frame(data), 
             is.character(var))
@@ -810,7 +810,7 @@ Allan_table
 -   Example 2
 
 ```{r dvs-7-2}
-#Challenge 9 Q10
+#Challenge 9 Q10 (revised)
 
 Allan_total_percentage <- cleaned_names |> 
   filter(Year == 2000,
@@ -1108,8 +1108,7 @@ I try my best to incorporate professor/peer feedback into future labs by reviewi
 
 <!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
 
-I have used online resources to further develop my understanding and also find new functions that I can use that were not taught in class yet. For example, in DVS-2, I learned about n.dodge on https://ggplot2.tidyverse.org/reference/guide_axis.html.
-In PE-2, I learned using "last" from https://www.rdocumentation.org/packages/data.table/versions/1.14.8/topics/last. I knew that I also could of replaced it with lyrics\[length(lyrics)\], but I wanted to experiment and try something unique and different. Also, in WD-4 dates, I learned about scale_x\_continuous and discrete through https://ggplot2.tidyverse.org/reference/scale_continuous.html.
+I have used online resources to further develop my understanding and also find new functions that I can use that were not taught in class yet. For example, in DVS-2, I learned about n.dodge on https://ggplot2.tidyverse.org/reference/guide_axis.html. In PE-2, I learned using "last" from https://www.rdocumentation.org/packages/data.table/versions/1.14.8/topics/last. I knew that I also could of replaced it with lyrics\[length(lyrics)\], but I wanted to experiment and try something unique and different. Also, in WD-4 dates, I learned about scale_x\_continuous and discrete through https://ggplot2.tidyverse.org/reference/scale_continuous.html.
 
 In DVS-7 , I went above and beyond by looking into other functions provided by gt packages and those were not informed by the lab description. I learned more about tab_style on https://gt.rstudio.com/reference/tab_style.html and also watched a few youtube videos on customization. In general, I would watch youtube videos to help me go above and beyond as well.
 
